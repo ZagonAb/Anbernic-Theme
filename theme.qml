@@ -18,6 +18,27 @@ FocusScope {
     property bool gamesVisible: false
     property bool gamesFocused: false
 
+    function getBatteryIcon() {
+        if (isNaN(api.device.batteryPercent) || api.device.batteryCharging) {
+            return "assets/icons/charging.png";
+        } else {
+            const batteryPercent = api.device.batteryPercent * 100;
+            if (batteryPercent <= 20) {
+                return "assets/icons/10.png";
+            } else if (batteryPercent <= 40) {
+                return "assets/icons/25.png";
+            } else if (batteryPercent <= 60) {
+                return "assets/icons/50.png";
+            } else if (batteryPercent <= 80) {
+                return "assets/icons/75.png";
+            } else if (batteryPercent <= 90) {
+                return "assets/icons/90.png";
+            } else {
+                return "assets/icons/95.png";
+            }
+        }
+    }
+
     function getColorForSystem(shortName) {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", "assets/colorshortname.txt", false);
@@ -54,7 +75,7 @@ FocusScope {
             leftMargin: 20
         }
         color: "white"
-        font.pixelSize: 24
+        font.pixelSize: root.width * 0.02
         font.bold: true
         visible: collectionsVisible
 
@@ -71,79 +92,49 @@ FocusScope {
         }
         text: formatTime()
         Timer {
-            interval: 1000
             running: true
+            interval: 1000
             repeat: true
             onTriggered: clock.text = clock.formatTime()
         }
     }
 
-    Row {
+    Item {
         id: batteryIndicator
+        width: parent.width
+        height: 40
         anchors {
             top: parent.top
-            right: parent.right
             topMargin: 20
-            rightMargin: 20
-        }
-        spacing: 8
-
-        Text {
-            id: batteryText
-            color: "white"
-            font.pixelSize: 24
-            text: "N/A" // Por defecto "N/A"
         }
 
-        Image {
-            id: batteryIcon
-            source: "assets/icons/charging.png"
-            width: 40
-            height: 24
-            fillMode: Image.PreserveAspectFit
-            asynchronous: true
-            mipmap: true
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        // Timer para actualizar el estado de la batería
         Timer {
-            interval: 5000 // Actualizar cada 5 segundos
+            id: batteryUpdateTimer
+            triggeredOnStart: true
+            interval: 5000
             running: true
             repeat: true
-            onTriggered: updateBatteryStatus()
+            onTriggered: batteryIcon.source = getBatteryIcon()
         }
-    }
 
-    function updateBatteryStatus() {
-        if (typeof navigator.getBattery === "function") {
-            navigator.getBattery().then(function(battery) {
-                let level = battery.level * 100;
-                let isCharging = battery.charging;
+        Row {
+            anchors {
+                right: parent.right
+                rightMargin: 10
+                verticalCenter: parent.verticalCenter
+            }
+            spacing: 5
 
-                if (isCharging || level > 95) {
-                    batteryText.text = "95%+";
-                    batteryIcon.source = "assets/icons/charging.png";
-                } else if (level > 90) {
-                    batteryText.text = "90%";
-                    batteryIcon.source = "assets/icons/95.png";
-                } else if (level > 75) {
-                    batteryText.text = "75%";
-                    batteryIcon.source = "assets/icons/75.png";
-                } else if (level > 50) {
-                    batteryText.text = "50%";
-                    batteryIcon.source = "assets/icons/50.png";
-                } else if (level > 25) {
-                    batteryText.text = "25%";
-                    batteryIcon.source = "assets/icons/25.png";
-                } else {
-                    batteryText.text = "10%";
-                    batteryIcon.source = "assets/icons/10.png";
-                }
-            });
-        } else {
-            batteryText.text = "N/A";
-            batteryIcon.source = "assets/icons/charging.png";
+            Image {
+                id: batteryIcon
+                source: getBatteryIcon()
+                width: batteryIndicator.width * 0.1
+                height: root.height * 0.04
+                fillMode: Image.PreserveAspectFit
+                mipmap: true
+                asynchronous: true
+                visible: collectionsVisible
+            }
         }
     }
 
@@ -190,14 +181,14 @@ FocusScope {
                 id: selectionRect
                 anchors {
                     fill: parent
-                    margins: -parent.width * 0.025  // Márgenes proporcionales
+                    margins: -parent.width * 0.025
                     topMargin: -parent.width * 0.05
                     bottomMargin: -systemView.height * 0.6
                 }
                 color: "transparent"
                 border.color: "white"
-                border.width: Math.max(2, parent.width * 0.015)  // Grosor del borde proporcional
-                radius: parent.width * 0.2  // Radio proporcional
+                border.width: Math.max(2, parent.width * 0.015)
+                radius: parent.width * 0.2
                 opacity: delegateItem.PathView.isCurrentItem ? 1 : 0
                 Behavior on opacity {
                     NumberAnimation { duration: 300 }
@@ -208,7 +199,7 @@ FocusScope {
                 id: systemIcon
                 anchors {
                     fill: parent
-                    margins: parent.width * 0.05  // Márgenes proporcionales
+                    margins: parent.width * 0.05
                 }
                 source: "assets/shortnames/" + modelData.shortName + ".png"
                 fillMode: Image.PreserveAspectFit
@@ -222,20 +213,20 @@ FocusScope {
                     bottomMargin: selectionRect.height * 0.05
                     horizontalCenter: parent.horizontalCenter
                 }
-                spacing: parent.height * 0.01  // Espaciado proporcional
+                spacing: parent.height * 0.01
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: modelData.shortName.toUpperCase() || ""
                     color: "white"
                     font.bold: true
-                    font.pixelSize: delegateItem.width * 0.1  // Tamaño de fuente proporcional
+                    font.pixelSize: delegateItem.width * 0.1
                 }
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "(1992)"
                     color: "white"
-                    font.pixelSize: delegateItem.width * 0.1  // Tamaño de fuente proporcional
+                    font.pixelSize: delegateItem.width * 0.1
                     font.bold: true
                 }
             }
@@ -271,7 +262,7 @@ FocusScope {
 
         onCurrentIndexChanged: {
             const selectedCollection = api.collections.get(currentIndex);
-            gameListView.model = selectedCollection.games; // juegos de cada colección seleccionada.
+            gameListView.model = selectedCollection.games;
             currentCollectionName = model.get(currentIndex).name;
             currentShortName = model.get(currentIndex).shortName;
             root.backgroundColor = getColorForSystem(currentShortName);
@@ -293,11 +284,12 @@ FocusScope {
         anchors {
             bottom: dotsRow.top
             horizontalCenter: parent.horizontalCenter
-            bottomMargin: 10
+            bottomMargin: root.width * 0.015
         }
         text: api.collections.get(systemView.currentIndex).games.count + " games"
         color: "white"
-        font.pixelSize: 16
+        font.pixelSize: root.width * 0.015
+        font.bold: true
         visible: collectionsVisible
     }
 
@@ -306,7 +298,7 @@ FocusScope {
         anchors {
             bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
-            bottomMargin: 20
+            bottomMargin: root.width * 0.05
         }
         spacing: 8
         visible: collectionsVisible
@@ -389,6 +381,18 @@ FocusScope {
                     anchors.leftMargin: 10
                     width: parent.width - 20
                 }
+
+                /*Text {
+                 * id: noEnumerator
+                 * text: model.title
+                 * color: gameListView.currentIndex === index ? "black" : "white"
+                 * font.pixelSize: gameListView.width * 0.05
+                 * elide: Text.ElideRight
+                 * anchors.verticalCenter: parent.verticalCenter
+                 * anchors.left: parent.left
+                 * anchors.leftMargin: 10
+                 * width: parent.width - 20
+                } */
             }
 
             focus: gamesFocused
@@ -408,16 +412,3 @@ FocusScope {
         }
     }
 }
-
-
-/*Text {
- * id: noEnumerator
- * text: model.title
- * color: gameListView.currentIndex === index ? "black" : "white"
- * font.pixelSize: gameListView.width * 0.05
- * elide: Text.ElideRight
- * anchors.verticalCenter: parent.verticalCenter
- * anchors.left: parent.left
- * anchors.leftMargin: 10
- * width: parent.width - 20
- } */
