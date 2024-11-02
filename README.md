@@ -7,5 +7,5 @@
 [repositorio de RetroArch](https://github.com/libretro/retroarch-assets)
 
 
- ![screenshot](https://github.com/user-attachments/assets/eea2b804-a544-4e6c-8b2f-d9d4f07722a3)
+![screenshot](https://github.com/user-attachments/assets/eea2b804-a544-4e6c-8b2f-d9d4f07722a3)
 
