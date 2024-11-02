@@ -17,6 +17,7 @@ FocusScope {
     property bool collectionsFocused: true
     property bool gamesVisible: false
     property bool gamesFocused: false
+    property var game: null
 
     function getBatteryIcon() {
         if (isNaN(api.device.batteryPercent) || api.device.batteryCharging) {
@@ -325,12 +326,13 @@ FocusScope {
         }
     }
 
-    Item {
+    /*Item {
         width: parent.width
         height: parent.height
         visible: gamesVisible
 
         Rectangle {
+            id: gameRectangle
             anchors {
                 left: parent.left
                 leftMargin: 20
@@ -381,18 +383,6 @@ FocusScope {
                     anchors.leftMargin: 10
                     width: parent.width - 20
                 }
-
-                /*Text {
-                 * id: noEnumerator
-                 * text: model.title
-                 * color: gameListView.currentIndex === index ? "black" : "white"
-                 * font.pixelSize: gameListView.width * 0.05
-                 * elide: Text.ElideRight
-                 * anchors.verticalCenter: parent.verticalCenter
-                 * anchors.left: parent.left
-                 * anchors.leftMargin: 10
-                 * width: parent.width - 20
-                } */
             }
 
             focus: gamesFocused
@@ -410,5 +400,134 @@ FocusScope {
                 }
             }
         }
+    }*/
+
+    Item {
+        width: parent.width
+        height: parent.height
+        visible: gamesVisible
+
+        // Left rectangle for game list
+        Rectangle {
+            id: gameRectangle
+            anchors {
+                left: parent.left
+                leftMargin: 20
+                verticalCenter: parent.verticalCenter
+            }
+            width: parent.width * 0.4
+            height: parent.height * 0.80
+            color: "black"
+            opacity: 0.2
+            radius: 5
+            border.color: "transparent"
+        }
+
+        Image {
+            id: gamepadImage
+            anchors {
+                left: gameRectangle.right
+                right: parent.right
+                leftMargin: 20
+                rightMargin: 20
+                verticalCenter: parent.verticalCenter
+            }
+            height: parent.height * 0.50
+            source: "assets/gamepad/" + currentShortName + ".png"
+            fillMode: Image.PreserveAspectFit
+            asynchronous: true
+            visible: !gameImage.source || gameImage.status === Image.Error
+        }
+
+        Image {
+            id: gameImage
+            anchors {
+                left: gameRectangle.right
+                right: parent.right
+                leftMargin: 20
+                rightMargin: 20
+                verticalCenter: parent.verticalCenter
+            }
+            height: parent.height * 0.70
+            source: ""
+            fillMode: Image.PreserveAspectFit
+            asynchronous: true
+        }
+
+
+        ListView {
+            id: gameListView
+            anchors {
+                left: parent.left
+                leftMargin: 20
+                verticalCenter: parent.verticalCenter
+            }
+            width: parent.width * 0.4
+            height: parent.height * 0.80
+            spacing: 5
+            delegate: Item {
+                width: gameListView.width
+                height: 40
+                Rectangle {
+                    id: highlightRect
+                    anchors.fill: parent
+                    color: gameListView.currentIndex === index ? "yellow" : "transparent"
+                    radius: 5
+                }
+                Text {
+                    id: numerator
+                    text: {
+                        let number = (index + 1).toString().padStart(3, "0");
+                        `${number} - ${model.title}`;
+                    }
+                    color: gameListView.currentIndex === index ? "black" : "white"
+                    font.bold: true
+                    font.pixelSize: gameListView.width * 0.05
+                    elide: Text.ElideRight
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    width: parent.width - 20
+                }
+            }
+            focus: gamesFocused
+
+            Keys.onUpPressed: gameListView.decrementCurrentIndex()
+            Keys.onDownPressed: gameListView.incrementCurrentIndex()
+            Keys.onPressed: {
+                if (!event.isAutoRepeat && api.keys.isCancel(event)) {
+                    event.accepted = true;
+                    collectionsVisible = true;
+                    collectionsFocused = true;
+                    gamesVisible = false;
+                    gamesFocused = false;
+                    systemView.forceActiveFocus();
+                }
+            }
+
+            onCurrentIndexChanged: {
+                game = gameListView.model.get(currentIndex);
+                gameImage.source = game.assets.boxFront;
+                console.log ("game is:" + game)
+            }
+
+            Component.onCompleted: {
+                game = gameListView.model.get(0);
+                gameImage.source = game.assets.boxFront;
+                gameListView.currentIndex = 0;
+            }
+        }
     }
 }
+
+/*Text {
+ * id: noEnumerator
+ * text: model.title
+ * color: gameListView.currentIndex === index ? "black" : "white"
+ * font.pixelSize: gameListView.width * 0.05
+ * elide: Text.ElideRight
+ * anchors.verticalCenter: parent.verticalCenter
+ * anchors.left: parent.left
+ * anchors.leftMargin: 10
+ * width: parent.width - 20
+ } */
