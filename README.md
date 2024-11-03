@@ -9,3 +9,12 @@
 # Screenshots
 
 ![screenshot](https://github.com/user-attachments/assets/eea2b804-a544-4e6c-8b2f-d9d4f07722a3)
+
+<details>
+  <summary>Haz clic aquí para ver la lista</summary>
+
+  - Elemento 1
+  - Elemento 2
+  - Elemento 3
+
+</details>
