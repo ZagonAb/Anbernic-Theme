@@ -57,6 +57,12 @@ FocusScope {
         return "#000000";
     }
 
+    SoundEffect {
+        id: naviSound
+        source: "assets/sound/mov.wav"
+        volume: 0.5
+    }
+
     Rectangle {
         id: background
         anchors.fill: parent
@@ -247,8 +253,8 @@ FocusScope {
         }
 
         focus: collectionsFocused
-        Keys.onLeftPressed: decrementCurrentIndex()
-        Keys.onRightPressed: incrementCurrentIndex()
+        Keys.onLeftPressed: decrementCurrentIndex(naviSound.play())
+        Keys.onRightPressed: incrementCurrentIndex(naviSound.play())
 
         Keys.onPressed: {
             if (!event.isAutoRepeat && api.keys.isAccept(event)) {
@@ -459,8 +465,8 @@ FocusScope {
             }
             focus: gamesFocused
 
-            Keys.onUpPressed: gameListView.decrementCurrentIndex()
-            Keys.onDownPressed: gameListView.incrementCurrentIndex()
+            Keys.onUpPressed: gameListView.decrementCurrentIndex(naviSound.play())
+            Keys.onDownPressed: gameListView.incrementCurrentIndex(naviSound.play())
             Keys.onPressed: {
                 if (!event.isAutoRepeat && api.keys.isCancel(event)) {
                     event.accepted = true;
