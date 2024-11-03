@@ -4,7 +4,7 @@
 - Las imágenes de la colección en "assets/shortname/" han sido recreadas siguiendo el estilo original.
 # Iconos Monochrome de RetroArch
 - Agradecemos a los diseñadores de los iconos monochrome utilizados en este tema.
-[repositorio de RetroArch](https://github.com/libretro/retroarch-assets)
+[repositorio de RetroArch](https://github.com/libretro/retroarch-assets/tree/master/xmb/monochrome/png)
 
 # Screenshots
 
