@@ -326,88 +326,46 @@ FocusScope {
         }
     }
 
-    /*Item {
-        width: parent.width
-        height: parent.height
-        visible: gamesVisible
-
-        Rectangle {
-            id: gameRectangle
-            anchors {
-                left: parent.left
-                leftMargin: 20
-                verticalCenter: parent.verticalCenter
-            }
-            width: parent.width * 0.4
-            height: parent.height * 0.80
-            color: "black"
-            opacity: 0.2
-            radius: 5
-            border.color: "transparent"
-        }
-
-        ListView {
-            id: gameListView
-            anchors {
-                left: parent.left
-                leftMargin: 20
-                verticalCenter: parent.verticalCenter
-            }
-            width: parent.width * 0.4
-            height: parent.height * 0.80
-            spacing: 5
-
-            delegate: Item {
-                width: gameListView.width
-                height: 40
-
-                Rectangle {
-                    id: highlightRect
-                    anchors.fill: parent
-                    color: gameListView.currentIndex === index ? "yellow" : "transparent"
-                    radius: 5
-                }
-
-                Text {
-                    id: numerator
-                    text: {
-                        let number = (index + 1).toString().padStart(3, "0");
-                        `${number} - ${model.title}`;
-                    }
-                    color: gameListView.currentIndex === index ? "black" : "white"
-                    font.bold: true
-                    font.pixelSize: gameListView.width * 0.05
-                    elide: Text.ElideRight
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: 10
-                    width: parent.width - 20
-                }
-            }
-
-            focus: gamesFocused
-            Keys.onUpPressed: gameListView.decrementCurrentIndex()
-            Keys.onDownPressed: gameListView.incrementCurrentIndex()
-
-            Keys.onPressed: {
-                if (!event.isAutoRepeat && api.keys.isCancel(event)) {
-                    event.accepted = true;
-                    collectionsVisible = true;
-                    collectionsFocused = true;
-                    gamesVisible = false;
-                    gamesFocused = false;
-                    systemView.forceActiveFocus();
-                }
-            }
-        }
-    }*/
-
     Item {
         width: parent.width
         height: parent.height
         visible: gamesVisible
 
-        // Left rectangle for game list
+        Row {
+            anchors {
+                top: parent.top
+                left: parent.left
+                topMargin: 20
+                leftMargin: root.width * 0.2
+            }
+            width: parent.width
+            height: parent.height
+            spacing: root.width * 0.27
+
+            Text {
+                color: "white"
+                font.pixelSize: root.width * 0.02
+                font.bold: true
+                text: "All"
+            }
+
+            Text {
+                color: "white"
+                font.pixelSize: root.width * 0.02
+                font.bold: true
+                text: currentShortName
+            }
+
+            Image {
+                source: "assets/shortnames/" + currentShortName + ".png"
+                width: parent.width * 0.09
+                height: parent.height * 0.09
+                fillMode: Image.PreserveAspectFit
+                mipmap: true
+                asynchronous: true
+            }
+        }
+
         Rectangle {
             id: gameRectangle
             anchors {
@@ -421,6 +379,16 @@ FocusScope {
             opacity: 0.2
             radius: 5
             border.color: "transparent"
+        }
+
+        Text {
+            text: "Games " +(gameListView.currentIndex + 1) + "/" + gameListView.model.count
+            font.pixelSize: root.width * 0.01
+            color: "white"
+            font.bold: true
+            anchors.top: gameRectangle.bottom
+            anchors.horizontalCenter: gameRectangle.horizontalCenter
+            anchors.topMargin: root.height * 0.03
         }
 
         Image {
@@ -454,7 +422,6 @@ FocusScope {
             asynchronous: true
         }
 
-
         ListView {
             id: gameListView
             anchors {
@@ -463,11 +430,11 @@ FocusScope {
                 verticalCenter: parent.verticalCenter
             }
             width: parent.width * 0.4
-            height: parent.height * 0.80
+            height: parent.height * 0.72
             spacing: 5
             delegate: Item {
                 width: gameListView.width
-                height: 40
+                height: 45
                 Rectangle {
                     id: highlightRect
                     anchors.fill: parent
