@@ -11,8 +11,8 @@
 - Las imágenes de la colección en "assets/shortname/" han sido recreadas siguiendo el estilo original.
 
 # Iconos Monochrome de RetroArch
-- Agradecemos a los diseñadores de los iconos monochrome utilizados en este tema.
-[proyecto libretro](https://github.com/libretro/retroarch-assets/tree/master/xmb/monochrome/png)
+
+- Iconos utilizados en este proyecto de varios colaboradores en [libretro](https://github.com/libretro/retroarch-assets/tree/master/xmb/monochrome/png) bajo la licencia [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/deed.en).
 
 <details>
   <summary>Lista de colecciones actual</summary>
