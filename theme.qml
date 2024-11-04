@@ -10,6 +10,7 @@ FocusScope {
     id: root
     focus: true
 
+    property var consoleYears: readYearsFile()
     property string currentShortName: ""
     property string currentCollectionName: ""
     property string backgroundColor: "#000000"
@@ -55,6 +56,30 @@ FocusScope {
             }
         }
         return "#000000";
+    }
+
+    function readYearsFile() {
+        const xhr = new XMLHttpRequest();
+        const yearsMap = {};
+
+        xhr.open("GET", "assets/yearsofconsoles.txt", false); // Síncrono para asegurar que tengamos los datos
+        try {
+            xhr.send();
+            if (xhr.status === 200) {
+                const lines = xhr.responseText.split('\n');
+                lines.forEach(line => {
+                    const [console, year] = line.split('=').map(s => s.trim());
+                    yearsMap[console] = year;
+                });
+            }
+        } catch (e) {
+            console.error("Error loading years file:", e);
+        }
+        return yearsMap;
+    }
+
+    function getConsoleYear(shortName) {
+        return consoleYears[shortName] || "none";
     }
 
     SoundEffect {
@@ -229,9 +254,17 @@ FocusScope {
                     font.bold: true
                     font.pixelSize: delegateItem.width * 0.1
                 }
-                Text {
+                /*Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "(1992)"
+                    color: "white"
+                    font.pixelSize: delegateItem.width * 0.1
+                    font.bold: true
+                }*/
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "(" + getConsoleYear(modelData.shortName) + ")"
                     color: "white"
                     font.pixelSize: delegateItem.width * 0.1
                     font.bold: true
@@ -473,7 +506,7 @@ FocusScope {
                  * anchors.left: parent.left
                  * anchors.leftMargin: 10
                  * width: parent.width - 20
-                } */
+            } */
             }
             focus: gamesFocused
 
