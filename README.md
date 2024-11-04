@@ -1,25 +1,18 @@
 # Anbernic Theme
-- Un tema para Pegasus Frontend.
-- Inspirado en la interfaz del Anbernic RG406V.
-- Hora en AM y PM
-- Estado actual de la bateria
-- Uso de boxFront
-- El uso de "001" y números consecutivos en la lista de juegos es opcional. Me he basado en videos de YouTube, y en algunos de ellos no he visto esta numeración aplicada. Para el evitar su uso <details>
-  <summary>Comente todo el Text</summary>
-  id: numerator
-  </details>
-
-- Las imágenes de la colección en "assets/shortname/" han sido recreadas siguiendo el estilo original.
-# Iconos Monochrome de RetroArch
-- Agradecemos a los diseñadores de los iconos monochrome utilizados en este tema.
-[proyecto libretro](https://github.com/libretro/retroarch-assets/tree/master/xmb/monochrome/png)
-
-
-# Screenshots
 
 ![screen1](https://github.com/ZagonAb/anbernic-theme/blob/8c304dad62be07efd1ee41f7f9dc37ed6e18f5c6/.meta/screenshots/screen1.png)
 
 ![screen2](https://github.com/ZagonAb/anbernic-theme/blob/8c304dad62be07efd1ee41f7f9dc37ed6e18f5c6/.meta/screenshots/screen2.png)
+
+- Un tema para Pegasus Frontend.
+- Inspirado en la interfaz del Anbernic RG406V.
+- El uso de "001" y números consecutivos en la lista de juegos es opcional. Basándome en algunos videos de YouTube, he notado que esta numeración no siempre está presente. Para desactivar esta función, comenta todo el bloque Text { id: numerator } usando /* */ luego puedes descomentar el bloque Text { id: noEnumerator }.
+- Como mencioné antes, me basé en videos de YouTube para crear este tema, por lo que no cuenta con todas las funcionalidades originales. De hecho, no incluirá todas las características del tema original, ya que no tengo una consola Anbernic y no encontré ningún video que detallara completamente la interfaz. Sin embargo, he tratado de replicar la estética lo más fielmente posible.
+- Las imágenes de la colección en "assets/shortname/" han sido recreadas siguiendo el estilo original.
+
+# Iconos Monochrome de RetroArch
+- Agradecemos a los diseñadores de los iconos monochrome utilizados en este tema.
+[proyecto libretro](https://github.com/libretro/retroarch-assets/tree/master/xmb/monochrome/png)
 
 <details>
   <summary>Lista de colecciones actual</summary>
