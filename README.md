@@ -30,7 +30,6 @@
   - studioii.png = RCA - Studio II
   - quake.png = Quake
   - psx.png = Sony - PlayStation
-  - atari800.png = none
   - 3ds.png = Nintendo - Nintendo 3DS
   - n64.png = Nintendo - Nintendo 64
   - saturn.png = Sega - Saturn

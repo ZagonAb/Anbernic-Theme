@@ -10,7 +10,6 @@ atari2600 = #4e3621
 studioii = #7f7660
 quake = #333d3d
 psx = #ad5200
-atari800 = #565656
 3ds = #003145
 n64 = #00613f
 saturn = #033a74
