@@ -8,7 +8,9 @@
 
 # Screenshots
 
-![screenshot](https://github.com/user-attachments/assets/eea2b804-a544-4e6c-8b2f-d9d4f07722a3)
+![screen1](https://github.com/ZagonAb/anbernic-theme/blob/8c304dad62be07efd1ee41f7f9dc37ed6e18f5c6/.meta/screenshots/screen1.png)
+
+![screen2](https://github.com/ZagonAb/anbernic-theme/blob/8c304dad62be07efd1ee41f7f9dc37ed6e18f5c6/.meta/screenshots/screen2.png)
 
 <details>
   <summary>Lista de colecciones actual</summary>
