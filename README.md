@@ -1,10 +1,19 @@
 # Anbernic Theme
 - Un tema para Pegasus Frontend.
 - Inspirado en la interfaz del Anbernic RG406V.
+- Hora en AM y PM
+- Estado actual de la bateria
+- Uso de boxFront
+- El uso de "001" y números consecutivos en la lista de juegos es opcional. Me he basado en videos de YouTube, y en algunos de ellos no he visto esta numeración aplicada. Para el evitar su uso <details>
+  <summary>Comente todo el Text</summary>
+  id: numerator
+  </details>
+
 - Las imágenes de la colección en "assets/shortname/" han sido recreadas siguiendo el estilo original.
 # Iconos Monochrome de RetroArch
 - Agradecemos a los diseñadores de los iconos monochrome utilizados en este tema.
 [proyecto libretro](https://github.com/libretro/retroarch-assets/tree/master/xmb/monochrome/png)
+
 
 # Screenshots
 
