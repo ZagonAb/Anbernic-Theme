@@ -3,10 +3,10 @@ dreamcast : 1998
 satellaview : 1995
 megadrive : 1988
 turbografxcd : 1988
-electronicgames : none
+electronicgames : 1977
 atarijaguar : 1993
 arcadia : 1982
-continueplaying : N/A
+continueplaying : various
 atari2600 : 1977
 studioii : 1977
 quake : 1996
@@ -29,7 +29,7 @@ wii : 2006
 sg1000 : 1983
 atari8bit : 1979
 msx : 1983
-favorite : N/A
+favorite : various
 psp : 2004
 n64dd : 1999
 amstradgx4000 : 1990
@@ -95,7 +95,7 @@ doom : 1993
 gbc : 1998
 virtualboy : 1995
 supergrafx : 1989
-ports : N/A
+ports : various
 naomi : 1998
 ps2 : 2000
 channelf : 1976
@@ -112,12 +112,12 @@ ngcd : 1994
 atari5200 : 1982
 mame2003plus : 2003
 gamegear : 1990
-fbneo : none
+fbneo : various
 leapster : 2003
 lutro : N/A
 lowres : 2017
 turbografx16 : 1987
-arcade : N/A
+arcade : various
 wiiu : 2012
 commodorevic20 : 1980
 dsi : 2008
