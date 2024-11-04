@@ -21,7 +21,7 @@ segapico : 1993
 3do-option2 : 1993
 intellivision : 1979
 amstradcpc : 1984
-thomsonmoto : none
+thomsonmoto : 1984
 superacan : 1995
 3do : 1993
 steam : 2003
@@ -30,7 +30,7 @@ wii : 2006
 sg1000 : 1983
 atari8bit : 1979
 msx : 1983
-favorite : none
+favorite : N/A
 psp : 2004
 n64dd : 1999
 amstradgx4000 : 1990
