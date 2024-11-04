@@ -6,12 +6,11 @@ turbografxcd : 1988
 electronicgames : none
 atarijaguar : 1993
 arcadia : 1982
-continueplaying : none
+continueplaying : N/A
 atari2600 : 1977
 studioii : 1977
 quake : 1996
 psx : 1994
-atari800 : none
 3ds : 2011
 n64 : 1996
 saturn : 1994
@@ -96,7 +95,7 @@ doom : 1993
 gbc : 1998
 virtualboy : 1995
 supergrafx : 1989
-ports : none
+ports : N/A
 naomi : 1998
 ps2 : 2000
 channelf : 1976
@@ -115,10 +114,10 @@ mame2003plus : 2003
 gamegear : 1990
 fbneo : none
 leapster : 2003
-lutro : none
+lutro : N/A
 lowres : 2017
 turbografx16 : 1987
-arcade : none
+arcade : N/A
 wiiu : 2012
 commodorevic20 : 1980
 dsi : 2008
