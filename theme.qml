@@ -462,6 +462,18 @@ FocusScope {
                     anchors.leftMargin: 10
                     width: parent.width - 20
                 }
+
+                /*Text {
+                 * id: noEnumerator
+                 * text: model.title
+                 * color: gameListView.currentIndex === index ? "black" : "white"
+                 * font.pixelSize: gameListView.width * 0.05
+                 * elide: Text.ElideRight
+                 * anchors.verticalCenter: parent.verticalCenter
+                 * anchors.left: parent.left
+                 * anchors.leftMargin: 10
+                 * width: parent.width - 20
+                } */
             }
             focus: gamesFocused
 
@@ -492,15 +504,3 @@ FocusScope {
         }
     }
 }
-
-/*Text {
- * id: noEnumerator
- * text: model.title
- * color: gameListView.currentIndex === index ? "black" : "white"
- * font.pixelSize: gameListView.width * 0.05
- * elide: Text.ElideRight
- * anchors.verticalCenter: parent.verticalCenter
- * anchors.left: parent.left
- * anchors.leftMargin: 10
- * width: parent.width - 20
- } */
