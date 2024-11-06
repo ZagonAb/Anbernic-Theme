@@ -10,7 +10,6 @@ FocusScope {
     id: root
     focus: true
 
-    property var consoleYears: readYearsFile()
     property string currentShortName: ""
     property string currentCollectionName: ""
     property string backgroundColor: "#000000"
@@ -18,7 +17,8 @@ FocusScope {
     property bool collectionsFocused: true
     property bool gamesVisible: false
     property bool gamesFocused: false
-    property var game: null
+    property var game : null
+
 
     function getBatteryIcon() {
         if (isNaN(api.device.batteryPercent) || api.device.batteryCharging) {
@@ -41,45 +41,12 @@ FocusScope {
         }
     }
 
-    function getColorForSystem(shortName) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", "assets/colorshortname.txt", false);
-        xhr.send();
-
-        if (xhr.status === 200) {
-            const lines = xhr.responseText.split("\n");
-            for (let line of lines) {
-                const [system, color] = line.split("=").map(s => s.trim());
-                if (system === shortName) {
-                    return color;
-                }
-            }
-        }
-        return "#000000";
-    }
-
-    function readYearsFile() {
-        const xhr = new XMLHttpRequest();
-        const yearsMap = {};
-
-        xhr.open("GET", "assets/yearsofconsoles.txt", false); // Síncrono para asegurar que tengamos los datos
-        try {
-            xhr.send();
-            if (xhr.status === 200) {
-                const lines = xhr.responseText.split('\n');
-                lines.forEach(line => {
-                    const [console, year] = line.split('=').map(s => s.trim());
-                    yearsMap[console] = year;
-                });
-            }
-        } catch (e) {
-            console.error("Error loading years file:", e);
-        }
-        return yearsMap;
-    }
-
     function getConsoleYear(shortName) {
-        return consoleYears[shortName] || "none";
+        return consoleYears[shortName.toLowerCase()] || "none";
+    }
+
+    function getColorForSystem(shortName) {
+        return consoleColors[shortName.toLowerCase()] || "#000000";
     }
 
     SoundEffect {
@@ -92,7 +59,6 @@ FocusScope {
         id: background
         anchors.fill: parent
         color: root.backgroundColor
-
         Behavior on color {
             ColorAnimation { duration: 500 }
         }
@@ -233,9 +199,10 @@ FocusScope {
                     fill: parent
                     margins: parent.width * 0.05
                 }
-                source: "assets/shortnames/" + modelData.shortName + ".png"
+
+                source: model.shortName ? "assets/shortnames/" + model.shortName + ".png" : "assets/shortnames/default.png"
                 fillMode: Image.PreserveAspectFit
-                asynchronous: true
+                //asynchronous: true
                 mipmap: true
             }
 
@@ -254,13 +221,6 @@ FocusScope {
                     font.bold: true
                     font.pixelSize: delegateItem.width * 0.1
                 }
-                /*Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "(1992)"
-                    color: "white"
-                    font.pixelSize: delegateItem.width * 0.1
-                    font.bold: true
-                }*/
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -317,6 +277,7 @@ FocusScope {
             currentShortName = model.get(currentIndex).shortName;
             root.backgroundColor = getColorForSystem(currentShortName);
         }
+
     }
 
     Text {
@@ -396,7 +357,7 @@ FocusScope {
             }
 
             Image {
-                source: "assets/shortnames/" + currentShortName + ".png"
+                source: currentShortName ? "assets/shortnames/" + currentShortName + ".png" : "assets/shortnames/default.png"
                 width: parent.width * 0.09
                 height: parent.height * 0.09
                 fillMode: Image.PreserveAspectFit
@@ -440,7 +401,7 @@ FocusScope {
                 verticalCenter: parent.verticalCenter
             }
             height: parent.height * 0.50
-            source: "assets/gamepad/" + currentShortName + ".png"
+            source: currentShortName ? "assets/gamepad/" + currentShortName + ".png" : "assets/gamepad/default.png"
             fillMode: Image.PreserveAspectFit
             asynchronous: true
             visible: !gameImage.source || gameImage.status === Image.Error
@@ -474,6 +435,7 @@ FocusScope {
             delegate: Item {
                 width: gameListView.width
                 height: 45
+                property var game: null
                 Rectangle {
                     id: highlightRect
                     anchors.fill: parent
@@ -506,8 +468,9 @@ FocusScope {
                  * anchors.left: parent.left
                  * anchors.leftMargin: 10
                  * width: parent.width - 20
-            } */
+                } */
             }
+
             focus: gamesFocused
 
             Keys.onUpPressed: gameListView.decrementCurrentIndex(naviSound.play())
@@ -525,15 +488,264 @@ FocusScope {
 
             onCurrentIndexChanged: {
                 game = gameListView.model.get(currentIndex);
-                gameImage.source = game.assets.boxFront;
-                console.log ("game is:" + game)
-            }
-
-            Component.onCompleted: {
-                game = gameListView.model.get(0);
-                gameImage.source = game.assets.boxFront;
-                gameListView.currentIndex = 0;
+                gameImage.source = game && game.assets.boxFront;
+                gameListView.model.get(0);
+                //console.log ("game is:" + game.title) // Test
             }
         }
+    }
+
+    readonly property var consoleYears: {
+        "mastersystem": "1985",
+        "dreamcast": "1998",
+        "satellaview": "1995",
+        "megadrive": "1988",
+        "turbografxcd": "1988",
+        "electronicgames": "1977",
+        "atarijaguar": "1993",
+        "arcadia": "1982",
+        "continueplaying": "various",
+        "atari2600": "1977",
+        "studioii": "1977",
+        "quake": "1996",
+        "psx": "1994",
+        "3ds": "2011",
+        "n64": "1996",
+        "saturn": "1994",
+        "wonderswan": "1999",
+        "gamecube": "2001",
+        "segapico": "1993",
+        "3do-option2": "1993",
+        "intellivision": "1979",
+        "amstradcpc": "1984",
+        "thomsonmoto": "1984",
+        "superacan": "1995",
+        "3do": "1993",
+        "steam": "2003",
+        "gp32": "2001",
+        "wii": "2006",
+        "sg1000": "1983",
+        "atari8bit": "1979",
+        "msx": "1983",
+        "favorite": "various",
+        "psp": "2004",
+        "n64dd": "1999",
+        "amstradgx4000": "1990",
+        "xbox360": "2005",
+        "watara": "1992",
+        "gog": "2008",
+        "sega32x": "1994",
+        "loopy": "1995",
+        "commodorepet": "1977",
+        "commodore64": "1982",
+        "necpc98": "1982",
+        "cavestory": "2004",
+        "rpgmaker": "1988",
+        "gb": "1989",
+        "commodorecdtv": "1991",
+        "tiger": "1997",
+        "adventurevision": "1982",
+        "mame2003": "2003",
+        "vectrex": "1982",
+        "wonderswancolor": "2000",
+        "vsmile": "2004",
+        "videopac+": "1978",
+        "segacd": "1991",
+        "vircon32": "2021",
+        "necpc8001": "1979",
+        "mame2010": "2010",
+        "commodoreplus4": "1984",
+        "mame2003midway": "2003",
+        "amigacd32": "1993",
+        "tic80": "2016",
+        "sufamiturbo": "1996",
+        "arduboy": "2015",
+        "jagaurcd": "1995",
+        "snes": "1990",
+        "cassettevision": "1981",
+        "colecovision": "1982",
+        "snkneogeo": "1990",
+        "xbox": "2001",
+        "nes": "1983",
+        "ngp": "1998",
+        "atarilynx": "1989",
+        "ds": "2004",
+        "naomi2": "2000",
+        "gba": "2001",
+        "pv1000": "1983",
+        "switch": "2017",
+        "atarist": "1985",
+        "wasm4": "2021",
+        "pokemini": "2001",
+        "dos": "1981",
+        "pcfx": "1994",
+        "ngpc": "1999",
+        "lutris": "2010",
+        "creativision": "1981",
+        "gamemaster": "1990",
+        "zx81": "1981",
+        "amiga": "1985",
+        "msx2": "1985",
+        "atari7800": "1986",
+        "odyssey2": "1978",
+        "scummvm": "2001",
+        "doom": "1993",
+        "gbc": "1998",
+        "virtualboy": "1995",
+        "supergrafx": "1989",
+        "ports": "various",
+        "naomi": "1998",
+        "ps2": "2000",
+        "channelf": "1976",
+        "mame": "1997",
+        "mrboom": "1999",
+        "atomiswave": "2003",
+        "mame2000": "2000",
+        "ps3": "2006",
+        "gc": "2001",
+        "nesdisk": "1986",
+        "ps4": "2013",
+        "zxspectrum": "1982",
+        "ngcd": "1994",
+        "atari5200": "1982",
+        "mame2003plus": "2003",
+        "gamegear": "1990",
+        "fbneo": "various",
+        "leapster": "2003",
+        "lutro": "N/A",
+        "lowres": "2017",
+        "turbografx16": "1987",
+        "arcade": "various",
+        "wiiu": "2012",
+        "commodorevic20": "1980",
+        "dsi": "2008",
+        "vita": "2011"
+    }
+
+    readonly property var consoleColors: {
+        "nesdisk": "#817d00",
+        "mastersystem": "#4d0d0c",
+        "dreamcast": "#5c5c5c",
+        "megadrive": "#20346d",
+        "turbografxcd": "#6a3921",
+        "electronicgames": "#247f00",
+        "arcadia": "#625a43",
+        "continueplaying": "#048d2f",
+        "atari2600": "#4e3621",
+        "studioii": "#7f7660",
+        "quake": "#333d3d",
+        "psx": "#ad5200",
+        "3ds": "#003145",
+        "n64": "#00613f",
+        "saturn": "#033a74",
+        "wonderswan": "#1f2319",
+        "segapico": "#9c8e63",
+        "3do-option2": "#706002",
+        "intellivision": "#6e614f",
+        "amstradcpc": "#305539",
+        "thomsonmoto": "#1e1e1b",
+        "3do": "#746305",
+        "atarijaguar": "#2a0000",
+        "steam": "#091734",
+        "gp32": "#145040",
+        "wii": "#4d4d4d",
+        "sg1000": "#636363",
+        "atari8bit": "#3f3428",
+        "msx": "#010101",
+        "favorite": "#8d023e",
+        "psp": "#003952",
+        "n64dd": "#002f1f",
+        "amstradgx4000": "#56010f",
+        "xbox360": "#093b09",
+        "watara": "#3f571d",
+        "gog": "#230037",
+        "sega32x": "#530000",
+        "satellaview": "#2e3131",
+        "loopy": "#431f2e",
+        "necpc98": "#534d46",
+        "cavestory": "#141421",
+        "rpgmaker": "#171b16",
+        "gb": "#5c6a66",
+        "tiger": "#62684d",
+        "adventurevision": "#240200",
+        "mame2003": "#025a98",
+        "wonderswancolor": "#001a37",
+        "vsmile": "#934d10",
+        "videopac+": "#303032",
+        "segacd": "#777777",
+        "vircon32": "#29443a",
+        "necpc8001": "#252326",
+        "mame2010": "#025a98",
+        "mame2003midway": "#025a98",
+        "gamegear": "#324361",
+        "amigacd32": "#5a2b1d",
+        "tic80": "#1f5076",
+        "sufamiturbo": "#282825",
+        "arduboy": "#565456",
+        "jagaurcd": "#2a0000",
+        "snes": "#690900",
+        "cassettevision": "#284214",
+        "colecovision": "#1d1e1f",
+        "xbox": "#093b09",
+        "nes": "#7b3832",
+        "ngp": "#3e3d49",
+        "atarilynx": "#7a510e",
+        "ds": "#383838",
+        "naomi2": "#701d0b",
+        "gba": "#101542",
+        "pv1000": "#1b3a2f",
+        "switch": "#551610",
+        "atarist": "#31679a",
+        "wasm4": "#2e4219",
+        "pokemini": "#2a4219",
+        "dos": "#601d73",
+        "pcfx": "#af917a",
+        "ngpc": "#5a7787",
+        "lutris": "#ff8600",
+        "creativision": "#412c05",
+        "snkneogeo": "#807130",
+        "gamecube-option2": "#261c3d",
+        "gamemaster": "#425621",
+        "zx81": "#8a1f0c",
+        "amiga": "#454743",
+        "msx2": "#010101",
+        "atari7800": "#4c4b4b",
+        "odyssey2": "#f57d24",
+        "scummvm": "#026e1d",
+        "doom": "#793900",
+        "gbc": "#631f2e",
+        "virtualboy": "#1b0607",
+        "supergrafx": "#6a3921",
+        "ports": "#ac3903",
+        "vectrex": "#151414",
+        "commodoreplus4": "#150d08",
+        "naomi": "#701d0b",
+        "superarcan": "#2b2b2b",
+        "ps2": "#0a006a",
+        "commodore64": "#2c251e",
+        "channelf": "#2b1e19",
+        "mame": "#025a98",
+        "mrboom": "#3a211d",
+        "atomiswave": "#692c19",
+        "commodorecdtv": "#393a3d",
+        "mame2000": "#025a98",
+        "ps3": "#003384",
+        "gc": "#2a3472",
+        "ps4": "#121215",
+        "commodorevic20": "#1d1b3b",
+        "zxspectrum": "#8a1f0c",
+        "commodorepet": "#258179",
+        "ngcd": "#201f1a",
+        "atari5200": "#292524",
+        "mame2003plus": "#025a98",
+        "fbneo": "#99512f",
+        "leapster": "#384a1e",
+        "lutro": "#412037",
+        "lowres": "#743e03",
+        "turbografx16": "#6a3921",
+        "arcade": "#631f08",
+        "wiiu": "#012f3d",
+        "dsi": "#2a2a2a",
+        "vita": "#02013b"
     }
 }
