@@ -193,6 +193,19 @@ FocusScope {
                 }
             }
 
+            /*Image {
+                id: systemIcon
+                anchors {
+                    fill: parent
+                    margins: parent.width * 0.05
+                }
+
+                source: "assets/shortnames/" + model.shortName + ".png"
+                fillMode: Image.PreserveAspectFit
+                //asynchronous: true
+                mipmap: true
+            }*/
+
             Image {
                 id: systemIcon
                 anchors {
@@ -200,11 +213,18 @@ FocusScope {
                     margins: parent.width * 0.05
                 }
 
-                source: model.shortName ? "assets/shortnames/" + model.shortName + ".png" : "assets/shortnames/default.png"
+                source: "assets/shortnames/" + model.shortName + ".png"
                 fillMode: Image.PreserveAspectFit
-                //asynchronous: true
                 mipmap: true
+                asynchronous: true
+
+                onStatusChanged: {
+                    if (status === Image.Error) {
+                        source = "assets/shortnames/default.png";
+                    }
+                }
             }
+
 
             Column {
                 anchors {
@@ -357,12 +377,18 @@ FocusScope {
             }
 
             Image {
-                source: currentShortName ? "assets/shortnames/" + currentShortName + ".png" : "assets/shortnames/default.png"
+                source: "assets/shortnames/" + currentShortName + ".png"
                 width: parent.width * 0.09
                 height: parent.height * 0.09
                 fillMode: Image.PreserveAspectFit
                 mipmap: true
                 asynchronous: true
+
+                onStatusChanged: {
+                    if (status === Image.Error) {
+                        source = "assets/shortnames/default.png";
+                    }
+                }
             }
         }
 
@@ -391,6 +417,22 @@ FocusScope {
             anchors.topMargin: root.height * 0.03
         }
 
+        /*Image {
+            id: gamepadImage
+            anchors {
+                left: gameRectangle.right
+                right: parent.right
+                leftMargin: 20
+                rightMargin: 20
+                verticalCenter: parent.verticalCenter
+            }
+            height: parent.height * 0.50
+            source: "assets/gamepad/" + currentShortName + ".png"
+            fillMode: Image.PreserveAspectFit
+            asynchronous: true
+            visible: !gameImage.source || gameImage.status === Image.Error
+        }*/
+
         Image {
             id: gamepadImage
             anchors {
@@ -401,11 +443,19 @@ FocusScope {
                 verticalCenter: parent.verticalCenter
             }
             height: parent.height * 0.50
-            source: currentShortName ? "assets/gamepad/" + currentShortName + ".png" : "assets/gamepad/default.png"
+            source: "assets/gamepad/" + systemView.model.shortName + ".png"
             fillMode: Image.PreserveAspectFit
             asynchronous: true
             visible: !gameImage.source || gameImage.status === Image.Error
+
+            onStatusChanged: {
+                if (status === Image.Error) {
+                    source = "assets/gamepad/default.png";
+                }
+            }
+            mipmap: true
         }
+
 
         Image {
             id: gameImage
