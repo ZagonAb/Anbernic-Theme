@@ -7,7 +7,7 @@
 - Un tema para Pegasus Frontend.
 - Inspirado en la interfaz del Anbernic RG406V.
 - El uso de "001" y números consecutivos en la lista de juegos es opcional. Basándome en algunos videos de YouTube, he notado que esta numeración no siempre está presente. Para desactivar esta función, comenta todo el bloque Text { id: numerator } usando /* */ luego puedes descomentar el bloque Text { id: noEnumerator }.
-- Como mencioné antes, me basé en videos de YouTube para crear este tema, por lo que no cuenta con todas las funcionalidades originales. De hecho, no incluirá todas las características del tema original, ya que no tengo una consola Anbernic y no encontré ningún video que detallara completamente la interfaz. Sin embargo, he tratado de replicar la estética lo más fielmente posible.
+- Como mencioné antes, me basé en videos de YouTube para crear este tema, por lo que no cuenta con todas las funcionalidades originales. De hecho, no incluirá todas las características del tema original, ya que no tengo una consola Anbernic y no encontré ningún video que detallara mínimamente la interfaz. Sin embargo, he tratado de replicar la estética lo más fielmente posible.
 - Las imágenes de la colección en "assets/shortname/" han sido recreadas siguiendo el estilo original.
 
 # Iconos Monochrome de RetroArch
