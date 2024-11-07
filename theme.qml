@@ -19,7 +19,6 @@ FocusScope {
     property bool gamesFocused: false
     property var game : null
 
-
     function getBatteryIcon() {
         if (isNaN(api.device.batteryPercent) || api.device.batteryCharging) {
             return "assets/icons/charging.png";
@@ -49,12 +48,6 @@ FocusScope {
         return consoleColors[shortName.toLowerCase()] || "#000000";
     }
 
-    SoundEffect {
-        id: naviSound
-        source: "assets/sound/mov.wav"
-        volume: 0.5
-    }
-
     Rectangle {
         id: background
         anchors.fill: parent
@@ -62,6 +55,12 @@ FocusScope {
         Behavior on color {
             ColorAnimation { duration: 500 }
         }
+    }
+
+    SoundEffect {
+        id: naviSound
+        source: "assets/sound/mov.wav"
+        volume: 0.5
     }
 
     Text {
@@ -207,11 +206,10 @@ FocusScope {
 
                 onStatusChanged: {
                     if (status === Image.Error) {
-                        source = "assets/shortnames/default.png";
+                        source = "assets/shortnames/default3.png";
                     }
                 }
             }
-
 
             Column {
                 anchors {
@@ -284,7 +282,6 @@ FocusScope {
             currentShortName = model.get(currentIndex).shortName;
             root.backgroundColor = getColorForSystem(currentShortName);
         }
-
     }
 
     Text {
@@ -525,7 +522,6 @@ FocusScope {
                 game = gameListView.model.get(currentIndex);
                 gameImage.source = game && game.assets.boxFront;
                 gameListView.model.get(0);
-                //console.log ("game is:" + game.title) // Test
             }
         }
     }
