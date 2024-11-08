@@ -206,7 +206,7 @@ FocusScope {
 
                 onStatusChanged: {
                     if (status === Image.Error) {
-                        source = "assets/shortnames/default3.png";
+                        source = "assets/shortnames/default.png";
                     }
                 }
             }
