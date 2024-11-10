@@ -18,6 +18,7 @@ FocusScope {
     property bool gamesVisible: false
     property bool gamesFocused: false
     property var game : null
+    property int filterState: 0
 
     function getBatteryIcon() {
         if (isNaN(api.device.batteryPercent) || api.device.batteryCharging) {
@@ -46,6 +47,47 @@ FocusScope {
 
     function getColorForSystem(shortName) {
         return consoleColors[shortName.toLowerCase()] || "#000000";
+    }
+
+    SortFilterProxyModel {
+        id: proxyModel
+        sourceModel: systemView.currentIndex >= 0 ? api.collections.get(systemView.currentIndex).games : []
+
+        filters: AllOf {
+            ExpressionFilter {
+                expression: {
+                    if (root.filterState === 1) {
+                        return model.favorite === true;
+                    }
+                    if (root.filterState === 2) {
+                        var currentDate = new Date();
+                        var sevenDaysAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        var lastPlayedDate = new Date(model.lastPlayed);
+                        return lastPlayedDate >= sevenDaysAgo && (model.playTime / 60) > 1;
+                    }
+                    return true;
+                }
+            }
+        }
+
+        sorters: RoleSorter {
+            id: gameSorter
+            roleName: root.filterState === 2 ? "lastPlayed" : "title"
+            sortOrder: root.filterState === 2 ? Qt.DescendingOrder : Qt.AscendingOrder
+        }
+    }
+
+    Connections {
+        target: systemView
+        function onCurrentIndexChanged() {
+            if (systemView.currentIndex >= 0) {
+                const selectedCollection = api.collections.get(systemView.currentIndex);
+                proxyModel.sourceModel = selectedCollection.games;
+                gameListView.currentIndex = 0;
+                game = proxyModel.get(gameListView.currentIndex);
+                gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/nofound.png";
+            }
+        }
     }
 
     Rectangle {
@@ -121,6 +163,8 @@ FocusScope {
                 verticalCenter: parent.verticalCenter
             }
             spacing: 5
+
+            //Agregar "%" de batería.
 
             Image {
                 id: batteryIcon
@@ -267,7 +311,7 @@ FocusScope {
 
         onCurrentIndexChanged: {
             const selectedCollection = api.collections.get(currentIndex);
-            gameListView.model = selectedCollection.games;
+            proxyModel.sourceModel = selectedCollection.games;
             currentCollectionName = model.get(currentIndex).name;
             currentShortName = model.get(currentIndex).shortName;
             root.backgroundColor = getColorForSystem(currentShortName);
@@ -275,12 +319,13 @@ FocusScope {
 
         Component.onCompleted: {
             currentIndex = 0
-            const initialCollection = api.collections.get(0);
-            gameListView.model = initialCollection.games;
-            const selectedCollection = api.collections.get(currentIndex);
+            const initialCollection = api.collections.get(currentIndex);
+            proxyModel.sourceModel = initialCollection.games;
             currentCollectionName = model.get(currentIndex).name;
             currentShortName = model.get(currentIndex).shortName;
             root.backgroundColor = getColorForSystem(currentShortName);
+            game = proxyModel.get(gameListView.currentIndex);
+            gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/nofound.png";
         }
     }
 
@@ -340,18 +385,47 @@ FocusScope {
                 top: parent.top
                 left: parent.left
                 topMargin: 20
-                leftMargin: root.width * 0.2
+                leftMargin: root.width * 0.05
             }
-            width: parent.width
+            width: parent.width / 2
             height: parent.height
-            spacing: root.width * 0.27
+            spacing: root.width * 0.03
 
             Text {
-                color: "white"
+                id: favoritesText
+                color: root.filterState === 1 ? "white" : "#808080"
+                font.pixelSize: root.width * 0.02
+                font.bold: true
+                text: "Favorites"
+            }
+
+            Text {
+                id: allText
+                color: root.filterState === 0 ? "white" : "#808080"
                 font.pixelSize: root.width * 0.02
                 font.bold: true
                 text: "All"
             }
+
+            Text {
+                id: recentText
+                color: root.filterState === 2 ? "white" : "#808080"
+                font.pixelSize: root.width * 0.02
+                font.bold: true
+                text: "Recently Played"
+            }
+        }
+
+        Row {
+            anchors {
+                top: parent.top
+                right: parent.right
+                topMargin: 20
+                rightMargin: root.width * 0.02
+            }
+            width: parent.width / 3
+            height: parent.height
+            spacing: root.width * 0.20
 
             Text {
                 color: "white"
@@ -361,8 +435,12 @@ FocusScope {
             }
 
             Item {
-                width: parent.width * 0.09
-                height: parent.height * 0.09
+                anchors {
+                    top: parent.top
+                    topMargin: - root.height * 0.03
+                }
+                width: parent.width * 0.14
+                height: parent.height * 0.14
 
                 Image {
                     id: collectionImage
@@ -386,6 +464,7 @@ FocusScope {
                 }
             }
         }
+
 
         Rectangle {
             id: gameRectangle
@@ -464,21 +543,25 @@ FocusScope {
             width: parent.width * 0.4
             height: parent.height * 0.72
             spacing: 5
+            model: proxyModel
+
             delegate: Item {
                 width: gameListView.width
                 height: 45
                 property var game: null
+
                 Rectangle {
                     id: highlightRect
                     anchors.fill: parent
                     color: gameListView.currentIndex === index ? "yellow" : "transparent"
                     radius: 5
                 }
+
                 Text {
                     id: numerator
                     text: {
                         let number = (index + 1).toString().padStart(3, "0");
-                        `${number} - ${model.title}`;
+                        `${number} - ${model.title} ${model.favorite ? "★" : ""}`
                     }
                     color: gameListView.currentIndex === index ? "black" : "white"
                     font.bold: true
@@ -500,15 +583,21 @@ FocusScope {
                  * anchors.left: parent.left
                  * anchors.leftMargin: 10
                  * width: parent.width - 20
-                } */
+            } */
             }
 
             focus: gamesFocused
 
-            Keys.onUpPressed: gameListView.decrementCurrentIndex(naviSound.play())
-            Keys.onDownPressed: gameListView.incrementCurrentIndex(naviSound.play())
-            Keys.onPressed: {
-                if (!event.isAutoRepeat && api.keys.isCancel(event)) {
+            Keys.onUpPressed: gameListView.decrementCurrentIndex()
+            Keys.onDownPressed: gameListView.incrementCurrentIndex()
+            Keys.onPressed: function(event) {
+                if (api.keys.isFilters(event)) {
+                    root.filterState = (root.filterState + 1) % 3;
+                    gameListView.currentIndex = 0;
+                    game = proxyModel.get(gameListView.currentIndex);
+                    gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/default.png";
+                    event.accepted = true;
+                } else if (!event.isAutoRepeat && api.keys.isCancel(event)) {
                     event.accepted = true;
                     collectionsVisible = true;
                     collectionsFocused = true;
@@ -518,10 +607,10 @@ FocusScope {
                 }
             }
 
+
             onCurrentIndexChanged: {
-                game = gameListView.model.get(currentIndex);
-                gameImage.source = game && game.assets.boxFront;
-                gameListView.model.get(0);
+                game = proxyModel.get(gameListView.currentIndex);
+                gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/default.png";
             }
         }
     }
