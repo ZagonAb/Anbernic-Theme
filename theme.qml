@@ -163,7 +163,7 @@ FocusScope {
             }
             spacing: 5
 
-            //Agregar "%" de batería.
+            //Agregar "%" de batería. No se si sea necesario.!
 
             Image {
                 id: batteryIcon
@@ -299,6 +299,7 @@ FocusScope {
 
         Keys.onPressed: {
             if (!event.isAutoRepeat && api.keys.isAccept(event)) {
+                naviSound.play();
                 event.accepted = true;
                 collectionsVisible = false;
                 collectionsFocused = false;
@@ -582,30 +583,63 @@ FocusScope {
                  * anchors.left: parent.left
                  * anchors.leftMargin: 10
                  * width: parent.width - 20
-            } */
+                } */
             }
 
             focus: gamesFocused
 
-            Keys.onUpPressed: gameListView.decrementCurrentIndex()
-            Keys.onDownPressed: gameListView.incrementCurrentIndex()
+            Keys.onUpPressed: gameListView.decrementCurrentIndex(naviSound.play())
+            Keys.onDownPressed: gameListView.incrementCurrentIndex(naviSound.play())
+
             Keys.onPressed: function(event) {
                 if (api.keys.isFilters(event)) {
+                    naviSound.play();
                     root.filterState = (root.filterState + 1) % 3;
                     gameListView.currentIndex = 0;
                     game = proxyModel.get(gameListView.currentIndex);
                     gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/default.png";
                     event.accepted = true;
                 } else if (!event.isAutoRepeat && api.keys.isCancel(event)) {
+                    naviSound.play();
                     event.accepted = true;
                     collectionsVisible = true;
                     collectionsFocused = true;
                     gamesVisible = false;
                     gamesFocused = false;
                     systemView.forceActiveFocus();
+                } else if (!event.isAutoRepeat && api.keys.isAccept(event)) {
+                    naviSound.play();
+                    event.accepted = true;
+                    const currentCollection = api.collections.get(systemView.currentIndex);
+                    if (currentCollection && currentCollection.games) {
+                        const filteredGame = proxyModel.get(gameListView.currentIndex);
+
+                        if (filteredGame) {
+                            let originalGameIndex = -1;
+                            for (let i = 0; i < currentCollection.games.count; i++) {
+                                const game = currentCollection.games.get(i);
+                                if (game.title === filteredGame.title) {
+                                    originalGameIndex = i;
+                                    break;
+                                }
+                            }
+                            console.log("Colección actual:", currentCollection.name);
+                            console.log("Título del juego filtrado:", filteredGame.title);
+                            if (originalGameIndex !== -1) {
+                                const gameToLaunch = currentCollection.games.get(originalGameIndex);
+                                console.log("Lanzando juego:", gameToLaunch.title);
+                                gameToLaunch.launch();
+                            } else {
+                                console.log("No se encontró el juego en la colección original");
+                            }
+                        } else {
+                            console.log("No se pudo obtener el juego del modelo filtrado");
+                        }
+                    } else {
+                        console.log("No se pudo obtener la colección actual o sus juegos");
+                    }
                 }
             }
-
 
             onCurrentIndexChanged: {
                 game = proxyModel.get(gameListView.currentIndex);
