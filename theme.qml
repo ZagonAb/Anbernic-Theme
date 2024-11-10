@@ -421,11 +421,11 @@ FocusScope {
                 top: parent.top
                 right: parent.right
                 topMargin: 20
-                rightMargin: root.width * 0.02
+                rightMargin: root.width * 0.03
             }
             width: parent.width / 3
             height: parent.height
-            spacing: root.width * 0.20
+            spacing: root.width * 0.15
 
             Text {
                 color: "white"
@@ -586,6 +586,15 @@ FocusScope {
                 } */
             }
 
+            Text {
+                id: noGamesText
+                text: "No games found"
+                anchors.centerIn: parent
+                visible: proxyModel.count === 0
+                font.pixelSize: root.width *0.02
+                color: "#FFFFFF"
+            }
+
             focus: gamesFocused
 
             Keys.onUpPressed: gameListView.decrementCurrentIndex(naviSound.play())
@@ -599,6 +608,7 @@ FocusScope {
                     game = proxyModel.get(gameListView.currentIndex);
                     gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/default.png";
                     event.accepted = true;
+
                 } else if (!event.isAutoRepeat && api.keys.isCancel(event)) {
                     naviSound.play();
                     event.accepted = true;
@@ -607,13 +617,13 @@ FocusScope {
                     gamesVisible = false;
                     gamesFocused = false;
                     systemView.forceActiveFocus();
+
                 } else if (!event.isAutoRepeat && api.keys.isAccept(event)) {
                     naviSound.play();
                     event.accepted = true;
                     const currentCollection = api.collections.get(systemView.currentIndex);
                     if (currentCollection && currentCollection.games) {
                         const filteredGame = proxyModel.get(gameListView.currentIndex);
-
                         if (filteredGame) {
                             let originalGameIndex = -1;
                             for (let i = 0; i < currentCollection.games.count; i++) {
@@ -638,6 +648,33 @@ FocusScope {
                     } else {
                         console.log("No se pudo obtener la colección actual o sus juegos");
                     }
+
+                } else if (!event.isAutoRepeat && api.keys.isDetails(event)) {
+                    // Obtener el juego en el modelo original y alternar el estado de favorito
+                    const currentCollection = api.collections.get(systemView.currentIndex);
+                    if (currentCollection && currentCollection.games) {
+                        const filteredGame = proxyModel.get(gameListView.currentIndex);
+                        if (filteredGame) {
+                            // Encontrar el índice del juego en el modelo original
+                            let originalGameIndex = -1;
+                            for (let i = 0; i < currentCollection.games.count; i++) {
+                                const game = currentCollection.games.get(i);
+                                if (game.title === filteredGame.title) {
+                                    originalGameIndex = i;
+                                    break;
+                                }
+                            }
+                            if (originalGameIndex !== -1) {
+                                const gameToToggleFavorite = currentCollection.games.get(originalGameIndex);
+                                gameToToggleFavorite.favorite = !gameToToggleFavorite.favorite;
+                                proxyModel.invalidate(); // Actualiza el modelo filtrado
+                                console.log(`Juego '${gameToToggleFavorite.title}' ${gameToToggleFavorite.favorite ? 'agregado a favoritos' : 'eliminado de favoritos'}`);
+                            } else {
+                                console.log("No se encontró el juego en la colección original");
+                            }
+                        }
+                    }
+                    event.accepted = true;
                 }
             }
 
