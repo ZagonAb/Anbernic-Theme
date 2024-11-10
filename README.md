@@ -2,7 +2,7 @@
 
 ![screen1](https://github.com/ZagonAb/anbernic-theme/blob/53d7f42f98879d37ae5f4550925a4338a13c2c4d/.meta/screenshots/screen1.png)
 
-![screen2](https://github.com/ZagonAb/anbernic-theme/blob/8c304dad62be07efd1ee41f7f9dc37ed6e18f5c6/.meta/screenshots/screen2.png)
+![screen2](https://github.com/ZagonAb/anbernic-theme/blob/c75a4c66485a25bcbfc1591eb63d36dce7bc0af1/.meta/screenshots/screen2.png)
 
 - Un tema para Pegasus Frontend.
 - Inspirado en la interfaz del Anbernic RG406V.
