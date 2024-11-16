@@ -385,87 +385,116 @@ FocusScope {
         height: parent.height
         visible: gamesVisible
 
-        Row {
-            anchors {
-                top: parent.top
-                left: parent.left
-                topMargin: 20
-                leftMargin: root.width * 0.05
-            }
-            width: parent.width / 2
+        Item {
+            id: animatableItem
+            width: parent.width
             height: parent.height
-            spacing: root.width * 0.03
 
-            Text {
-                id: favoritesText
-                color: root.filterState === 1 ? "white" : "#808080"
-                font.pixelSize: root.width * 0.02
-                font.bold: true
-                text: "Favorites"
+            y: !gamesVisible ? -height : 0
+
+            SequentialAnimation on y {
+                NumberAnimation {
+                    from: -height
+                    to: 0
+                    duration: 500
+                    easing.type: Easing.OutCubic
+                }
+                running: gamesVisible
             }
 
-            Text {
-                id: allText
-                color: root.filterState === 0 ? "white" : "#808080"
-                font.pixelSize: root.width * 0.02
-                font.bold: true
-                text: "All"
+            SequentialAnimation on y {
+                NumberAnimation {
+                    from: 0
+                    to: -height
+                    duration: 500
+                    easing.type: Easing.InCubic
+                }
+                running: !gamesVisible
             }
 
-            Text {
-                id: recentText
-                color: root.filterState === 2 ? "white" : "#808080"
-                font.pixelSize: root.width * 0.02
-                font.bold: true
-                text: "Recently Played"
-            }
-        }
-
-        Row {
-            anchors {
-                top: parent.top
-                right: parent.right
-                topMargin: 20
-                rightMargin: root.width * 0.03
-            }
-            width: parent.width / 3
-            height: parent.height
-            spacing: root.width * 0.15
-
-            Text {
-                color: "white"
-                font.pixelSize: root.width * 0.02
-                font.bold: true
-                text: currentShortName
-            }
-
-            Item {
+            Row {
                 anchors {
                     top: parent.top
-                    topMargin: - root.height * 0.03
+                    left: parent.left
+                    right: parent.right
+                    topMargin: 20
+                    leftMargin: root.width * 0.05
+                    rightMargin: root.width * 0.03
                 }
-                width: parent.width * 0.14
-                height: parent.height * 0.14
+                width: parent.width
+                height: parent.height
+                spacing: root.width * 0.05
 
-                Image {
-                    id: collectionImage
-                    source: "assets/shortnames/" + currentShortName + ".png"
-                    width: parent.width
+                Row {
+                    width: parent.width / 2
                     height: parent.height
-                    fillMode: Image.PreserveAspectFit
-                    mipmap: true
-                    asynchronous: true
-                    visible: status !== Image.Error
+                    spacing: root.width * 0.03
+
+                    Text {
+                        id: favoritesText
+                        color: root.filterState === 1 ? "white" : "#808080"
+                        font.pixelSize: root.width * 0.02
+                        font.bold: true
+                        text: "Favorites"
+                    }
+
+                    Text {
+                        id: allText
+                        color: root.filterState === 0 ? "white" : "#808080"
+                        font.pixelSize: root.width * 0.02
+                        font.bold: true
+                        text: "All"
+                    }
+
+                    Text {
+                        id: recentText
+                        color: root.filterState === 2 ? "white" : "#808080"
+                        font.pixelSize: root.width * 0.02
+                        font.bold: true
+                        text: "Recently Played"
+                    }
                 }
 
-                Image {
-                    id: defaultImage
-                    source: "assets/shortnames/default.png"
-                    width: parent.width
+                Row {
+                    width: parent.width / 3
                     height: parent.height
-                    fillMode: Image.PreserveAspectFit
-                    mipmap: true
-                    visible: collectionImage.status === Image.Error
+                    spacing: root.width * 0.15
+                    anchors.right: parent.right
+
+                    Text {
+                        color: "white"
+                        font.pixelSize: root.width * 0.02
+                        font.bold: true
+                        text: currentShortName
+                    }
+
+                    Item {
+                        width: parent.width * 0.14
+                        height: parent.height * 0.14
+                        anchors.top: parent.top
+                        anchors.topMargin: -root.height * 0.03
+
+                        Image {
+                            id: collectionImage
+                            source: "assets/shortnames/" + currentShortName + ".png"
+                            width: parent.width
+                            height: parent.height
+                            fillMode: Image.PreserveAspectFit
+                            mipmap: true
+                            asynchronous: true
+                            visible: status !== Image.Error
+                        }
+
+                        Image {
+                            id: defaultImage
+                            source: "assets/shortnames/default.png"
+                            width: parent.width
+                            height: parent.height
+                            fillMode: Image.PreserveAspectFit
+                            mipmap: true
+                            visible: collectionImage.status === Image.Error
+                        }
+                    }
                 }
             }
         }
@@ -484,16 +513,6 @@ FocusScope {
             opacity: 0.2
             radius: 5
             border.color: "transparent"
-        }
-
-        Text {
-            text: "Games " +(gameListView.currentIndex + 1) + "/" + gameListView.model.count
-            font.pixelSize: root.width * 0.01
-            color: "white"
-            font.bold: true
-            anchors.top: gameRectangle.bottom
-            anchors.horizontalCenter: gameRectangle.horizontalCenter
-            anchors.topMargin: root.height * 0.03
         }
 
         Image {
@@ -697,18 +716,22 @@ FocusScope {
 
         Item {
             id: buttons
-            width: parent.width / 2
+            width: parent.width
             height: parent.height * 0.08
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.horizontalCenter: buttons.horizontalCenter
 
-            Row {
-                id: mainRow
-                spacing: root.width * 0.01
-                //anchors.horizontalCenter: parent.horizontalCenter
-                anchors.horizontalCenterOffset: parent.width * 0.05
+            Text {
+                id: gamesCountText
+                text: "Games " + (gameListView.currentIndex + 1) + "/" + gameListView.model.count
+                font.pixelSize: root.width * 0.015
+                color: "white"
+                font.bold: true
                 y: gamesVisible ? parent.height - height : parent.height
+                anchors {
+                    left: parent.left
+                    leftMargin: parent.width * 0.17
+                }
 
                 SequentialAnimation on y {
                     NumberAnimation {
@@ -722,6 +745,33 @@ FocusScope {
                     NumberAnimation {
                         to: parent.height
                         duration: 300
+                        easing.type: Easing.InCubic
+                    }
+                    running: !gamesVisible
+                }
+            }
+
+            Row {
+                id: mainRow
+                spacing: root.width * 0.01
+                anchors {
+                    right: parent.right
+                    rightMargin: parent.width * 0.1
+                }
+                y: gamesVisible ? parent.height - height : parent.height
+
+                SequentialAnimation on y {
+                    NumberAnimation {
+                        to: parent.height - height
+                        duration: 400
+                        easing.type: Easing.OutCubic
+                    }
+                    running: gamesVisible
+                }
+                SequentialAnimation on y {
+                    NumberAnimation {
+                        to: parent.height
+                        duration: 400
                         easing.type: Easing.InCubic
                     }
                     running: !gamesVisible
