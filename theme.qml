@@ -396,7 +396,7 @@ FocusScope {
                 NumberAnimation {
                     from: -height
                     to: 0
-                    duration: 500
+                    duration: 300
                     easing.type: Easing.OutCubic
                 }
                 running: gamesVisible
@@ -406,7 +406,7 @@ FocusScope {
                 NumberAnimation {
                     from: 0
                     to: -height
-                    duration: 500
+                    duration: 300
                     easing.type: Easing.InCubic
                 }
                 running: !gamesVisible
@@ -417,7 +417,7 @@ FocusScope {
                     top: parent.top
                     left: parent.left
                     right: parent.right
-                    topMargin: 20
+                    topMargin: 10
                     leftMargin: root.width * 0.05
                     rightMargin: root.width * 0.03
                 }
@@ -763,7 +763,7 @@ FocusScope {
                 SequentialAnimation on y {
                     NumberAnimation {
                         to: parent.height - height
-                        duration: 400
+                        duration: 300
                         easing.type: Easing.OutCubic
                     }
                     running: gamesVisible
@@ -771,7 +771,7 @@ FocusScope {
                 SequentialAnimation on y {
                     NumberAnimation {
                         to: parent.height
-                        duration: 400
+                        duration: 300
                         easing.type: Easing.InCubic
                     }
                     running: !gamesVisible
