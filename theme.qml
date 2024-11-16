@@ -701,11 +701,12 @@ FocusScope {
             height: parent.height * 0.08
             anchors.right: parent.right
             anchors.bottom: parent.bottom
+            anchors.horizontalCenter: buttons.horizontalCenter
 
             Row {
                 id: mainRow
                 spacing: root.width * 0.01
-                anchors.horizontalCenter: parent.horizontalCenter
+                //anchors.horizontalCenter: parent.horizontalCenter
                 anchors.horizontalCenterOffset: parent.width * 0.05
                 y: gamesVisible ? parent.height - height : parent.height
 
