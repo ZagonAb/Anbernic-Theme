@@ -193,6 +193,7 @@ FocusScope {
         preferredHighlightEnd: 0.5
         highlightRangeMode: PathView.StrictlyEnforceRange
         highlightMoveDuration: 300
+        opacity: collectionsVisible ? 1 : 0 // nuevo
         visible: collectionsVisible
         property real itemSpacing: width * 0.2
         property real delegateSize: Math.min(itemSpacing * 0.8, height * 0.8)
@@ -291,6 +292,10 @@ FocusScope {
                     easing.type: Easing.OutCubic
                 }
             }
+        }
+
+        Behavior on opacity {
+            NumberAnimation { duration: 300 }
         }
 
         focus: collectionsFocused
@@ -543,6 +548,8 @@ FocusScope {
             width: parent.width * 0.4
             height: parent.height * 0.72
             spacing: 5
+            opacity: gamesVisible ? 1 : 0
+            visible: gamesVisible
             model: proxyModel
 
             delegate: Item {
@@ -584,6 +591,10 @@ FocusScope {
                  * anchors.leftMargin: 10
                  * width: parent.width - 20
                 } */
+            }
+
+            Behavior on opacity {
+                NumberAnimation { duration: 300 }
             }
 
             Text {
@@ -681,6 +692,111 @@ FocusScope {
             onCurrentIndexChanged: {
                 game = proxyModel.get(gameListView.currentIndex);
                 gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/default.png";
+            }
+        }
+
+        Item {
+            id: buttons
+            width: parent.width / 2
+            height: parent.height * 0.08
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+
+            Row {
+                id: mainRow
+                spacing: root.width * 0.01
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.horizontalCenterOffset: parent.width * 0.05
+                y: gamesVisible ? parent.height - height : parent.height
+
+                SequentialAnimation on y {
+                    NumberAnimation {
+                        to: parent.height - height
+                        duration: 300
+                        easing.type: Easing.OutCubic
+                    }
+                    running: gamesVisible
+                }
+                SequentialAnimation on y {
+                    NumberAnimation {
+                        to: parent.height
+                        duration: 300
+                        easing.type: Easing.InCubic
+                    }
+                    running: !gamesVisible
+                }
+
+                Row {
+                    id: row1
+                    spacing: root.width * 0.001
+                    Image {
+                        source: "assets/icons/x.png"
+                        width: root.width * 0.03
+                        height: root.width * 0.03
+                        mipmap: true
+                    }
+                    Text {
+                        text: "Favorite"
+                        color: "white"
+                        font.pixelSize: root.width * 0.015
+                        font.bold: true
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    id: row2
+                    spacing: root.width * 0.001
+                    Image {
+                        source: "assets/icons/a.png"
+                        width: root.width * 0.03
+                        height: root.width * 0.03
+                        mipmap: true
+                    }
+                    Text {
+                        text: "OK"
+                        color: "white"
+                        font.pixelSize: root.width * 0.015
+                        font.bold: true
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    id: row3
+                    spacing: root.width * 0.001
+                    Image {
+                        source: "assets/icons/y.png"
+                        width: root.width * 0.03
+                        height: root.width * 0.03
+                        mipmap: true
+                    }
+                    Text {
+                        text: "Filter"
+                        color: "white"
+                        font.pixelSize: root.width * 0.015
+                        font.bold: true
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    id: row4
+                    spacing: root.width * 0.001
+                    Image {
+                        source: "assets/icons/b.png"
+                        width: root.width * 0.03
+                        height: root.width * 0.03
+                        mipmap: true
+                    }
+                    Text {
+                        text: "Back"
+                        color: "white"
+                        font.pixelSize: root.width * 0.015
+                        font.bold: true
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
             }
         }
     }
