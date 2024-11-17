@@ -413,17 +413,14 @@ FocusScope {
             }
 
             Row {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    right: parent.right
-                    topMargin: 10
-                    leftMargin: root.width * 0.05
-                    rightMargin: root.width * 0.03
-                }
                 width: parent.width
                 height: parent.height
                 spacing: root.width * 0.05
+                padding: root.width * 0.01
+                Item {
+                    width: root.width * 0.01
+                    height: parent.height
+                }
 
                 Row {
                     width: parent.width / 2
@@ -459,7 +456,6 @@ FocusScope {
                     width: parent.width / 3
                     height: parent.height
                     spacing: root.width * 0.15
-                    anchors.right: parent.right
 
                     Text {
                         color: "white"
@@ -471,8 +467,7 @@ FocusScope {
                     Item {
                         width: parent.width * 0.14
                         height: parent.height * 0.14
-                        anchors.top: parent.top
-                        anchors.topMargin: -root.height * 0.03
+                        y: -root.height * 0.03  // Márgenes para la imagen
 
                         Image {
                             id: collectionImage
@@ -498,7 +493,6 @@ FocusScope {
                 }
             }
         }
-
 
         Rectangle {
             id: gameRectangle
@@ -635,8 +629,13 @@ FocusScope {
                     naviSound.play();
                     root.filterState = (root.filterState + 1) % 3;
                     gameListView.currentIndex = 0;
-                    game = proxyModel.get(gameListView.currentIndex);
-                    gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/default.png";
+                    if (proxyModel.count === 0) {
+                        gameImage.source = "assets/gamepad/default.png";
+                        game = null;
+                    } else {
+                        game = proxyModel.get(gameListView.currentIndex);
+                        gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/gamepad/default.png";
+                    }
                     event.accepted = true;
 
                 } else if (!event.isAutoRepeat && api.keys.isCancel(event)) {
@@ -680,12 +679,10 @@ FocusScope {
                     }
 
                 } else if (!event.isAutoRepeat && api.keys.isDetails(event)) {
-                    // Obtener el juego en el modelo original y alternar el estado de favorito
                     const currentCollection = api.collections.get(systemView.currentIndex);
                     if (currentCollection && currentCollection.games) {
                         const filteredGame = proxyModel.get(gameListView.currentIndex);
                         if (filteredGame) {
-                            // Encontrar el índice del juego en el modelo original
                             let originalGameIndex = -1;
                             for (let i = 0; i < currentCollection.games.count; i++) {
                                 const game = currentCollection.games.get(i);
@@ -697,7 +694,7 @@ FocusScope {
                             if (originalGameIndex !== -1) {
                                 const gameToToggleFavorite = currentCollection.games.get(originalGameIndex);
                                 gameToToggleFavorite.favorite = !gameToToggleFavorite.favorite;
-                                proxyModel.invalidate(); // Actualiza el modelo filtrado
+                                proxyModel.invalidate();
                                 console.log(`Juego '${gameToToggleFavorite.title}' ${gameToToggleFavorite.favorite ? 'agregado a favoritos' : 'eliminado de favoritos'}`);
                             } else {
                                 console.log("No se encontró el juego en la colección original");
@@ -709,8 +706,13 @@ FocusScope {
             }
 
             onCurrentIndexChanged: {
-                game = proxyModel.get(gameListView.currentIndex);
-                gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/default.png";
+                if (proxyModel.count === 0) {
+                    gameImage.source = "assets/gamepad/default.png";
+                    game = null;
+                } else {
+                    game = proxyModel.get(gameListView.currentIndex);
+                    gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/gamepad/default.png";
+                }
             }
         }
 
@@ -723,7 +725,12 @@ FocusScope {
 
             Text {
                 id: gamesCountText
-                text: "Games " + (gameListView.currentIndex + 1) + "/" + gameListView.model.count
+                text: {
+                    if (gameListView.model.count === 0) {
+                        return "Games 0/0"
+                    }
+                    return "Games " + (gameListView.currentIndex + 1) + "/" + gameListView.model.count
+                }
                 font.pixelSize: root.width * 0.015
                 color: "white"
                 font.bold: true
@@ -741,6 +748,7 @@ FocusScope {
                     }
                     running: gamesVisible
                 }
+
                 SequentialAnimation on y {
                     NumberAnimation {
                         to: parent.height
@@ -847,6 +855,21 @@ FocusScope {
                         font.bold: true
                         anchors.verticalCenter: parent.verticalCenter
                     }
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: proxyModel
+        function onCountChanged() {
+            if (proxyModel.count === 0) {
+                gameImage.source = "assets/gamepad/default.png";
+                game = null;
+            } else {
+                if (gameListView.currentIndex >= 0) {
+                    game = proxyModel.get(gameListView.currentIndex);
+                    gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/gamepad/default.png";
                 }
             }
         }
