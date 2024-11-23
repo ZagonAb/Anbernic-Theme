@@ -103,6 +103,11 @@ FocusScope {
         source: "assets/sound/mov.wav"
         volume: 0.5
     }
+    SoundEffect {
+        id: faviSound
+        source: "assets/sound/fav.wav"
+        volume: 0.5
+    }
 
     Text {
         id: clock
@@ -678,6 +683,7 @@ FocusScope {
                     }
 
                 } else if (!event.isAutoRepeat && api.keys.isDetails(event)) {
+                    faviSound.play();
                     const currentCollection = api.collections.get(systemView.currentIndex);
                     if (currentCollection && currentCollection.games) {
                         const filteredGame = proxyModel.get(gameListView.currentIndex);
