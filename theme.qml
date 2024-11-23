@@ -163,8 +163,6 @@ FocusScope {
             }
             spacing: 5
 
-            //Agregar "%" de batería. No se si sea necesario.!
-
             Image {
                 id: batteryIcon
                 source: getBatteryIcon()
@@ -193,7 +191,7 @@ FocusScope {
         preferredHighlightEnd: 0.5
         highlightRangeMode: PathView.StrictlyEnforceRange
         highlightMoveDuration: 300
-        opacity: collectionsVisible ? 1 : 0 // nuevo
+        opacity: collectionsVisible ? 1 : 0
         visible: collectionsVisible
         property real itemSpacing: width * 0.2
         property real delegateSize: Math.min(itemSpacing * 0.8, height * 0.8)
@@ -417,6 +415,7 @@ FocusScope {
                 height: parent.height
                 spacing: root.width * 0.05
                 padding: root.width * 0.01
+
                 Item {
                     width: root.width * 0.01
                     height: parent.height
@@ -467,7 +466,7 @@ FocusScope {
                     Item {
                         width: parent.width * 0.14
                         height: parent.height * 0.14
-                        y: -root.height * 0.03  // Márgenes para la imagen
+                        y: -root.height * 0.03
 
                         Image {
                             id: collectionImage
