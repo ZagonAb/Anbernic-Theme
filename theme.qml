@@ -553,6 +553,7 @@ FocusScope {
             source: ""
             fillMode: Image.PreserveAspectFit
             asynchronous: true
+            mipmap: true
         }
 
         ListView {
