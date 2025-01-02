@@ -21,6 +21,9 @@
 
   - mastersystem.png = Sega - Master System - Mark III
   - dreamcast.png = Sega - Dreamcast
+  - cps1.png = Capcom - Play - System 1
+  - cps2.png = Capcom - Play - System 2
+  - cps3.png = Capcom - Play - System 3
   - satellaview.png = Nintendo - Satellaview
   - megadrive.png = Sega - Mega Drive - Genesis
   - turbografxcd.png = NEC - PC Engine CD - TurboGrafx-CD

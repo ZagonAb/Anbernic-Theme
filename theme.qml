@@ -8,7 +8,6 @@ import QtQuick.Window 2.15
 FocusScope {
     id: root
     focus: true
-
     property string currentShortName: ""
     property string currentCollectionName: ""
     property string backgroundColor: "#000000"
@@ -180,6 +179,7 @@ FocusScope {
             }
         }
     }
+
 
     PathView {
         id: systemView
@@ -884,6 +884,9 @@ FocusScope {
     readonly property var consoleYears: {
         "mastersystem": "1985",
         "dreamcast": "1998",
+        "cps1": "1988",
+        "cps2": "1993",
+        "cps3": "1996",
         "satellaview": "1995",
         "megadrive": "1988",
         "turbografxcd": "1988",
@@ -1010,6 +1013,9 @@ FocusScope {
 
     readonly property var consoleColors: {
         "nesdisk": "#817d00",
+        "cps1": "#000a7e",
+        "cps2": "#006453",
+        "cps3": "#005d02",
         "mastersystem": "#4d0d0c",
         "dreamcast": "#5c5c5c",
         "megadrive": "#20346d",
