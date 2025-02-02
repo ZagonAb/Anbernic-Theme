@@ -1097,6 +1097,7 @@ FocusScope {
         "creativision": "#412c05",
         "snkneogeo": "#807130",
         "gamecube-option2": "#261c3d",
+        "gamecube": "#261c3d",
         "gamemaster": "#425621",
         "zx81": "#8a1f0c",
         "amiga": "#454743",
