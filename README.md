@@ -1,4 +1,4 @@
-# Anbernic Theme
+# Anbernic theme
 
 - A theme for Pegasus Frontend.
 
@@ -10,16 +10,16 @@
 ![screen2](https://github.com/ZagonAb/anbernic-theme/blob/7d092722b829a944e605d8393b248551452f4b84/.meta/screenshots/screen2.png)
 
 
-# Iconos shotnames 
-- Las [imágenes](https://github.com/ZagonAb/Systems-Arts-consoles) del PathView "assets/shortnames/" han sido recreadas procurando mantener la mayor fidelidad posible al estilo original.
+# Short name icons
+- The PathView [images](https://github.com/ZagonAb/Systems-Arts-consoles) have been recreated trying to maintain the greatest possible fidelity to the original style.
 
-# Iconos Monochrome de RetroArch
+# RetroArch Monochrome Icons
 
-- Iconos utilizados en este proyecto de varios colaboradores en [libretro](https://github.com/libretro/retroarch-assets/tree/master/xmb/monochrome/png) bajo la licencia [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/deed.en).
+- Icons used in this project by various contributors at [libretro](https://github.com/libretro/retroarch-assets/tree/master/xmb/monochrome/png) under the [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/deed.en) license.
 
-## Instalación
+## Installation
 
-[Descarga](https://github.com/ZagonAb/anbernic-theme/archive/refs/heads/main.zip) y extrae el tema a tu [directorio de temas](http://pegasus-frontend.org/docs/user-guide/installing-themes). Luego puede seleccionarlo en el menú de configuración de Pegasus.
+[Download](https://github.com/ZagonAb/anbernic-theme/archive/refs/heads/main.zip) and extract the theme to your [theme directory](http://pegasus-frontend.org/docs/user-guide/installing-themes). You can then select it from the Pegasus settings menu.
 # Licencia
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Licencia Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"></a>
 
