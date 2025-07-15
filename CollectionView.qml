@@ -129,7 +129,11 @@ PathView {
     Keys.onRightPressed: incrementCurrentIndex(naviSound.play())
 
     Keys.onPressed: {
-        if (!event.isAutoRepeat && api.keys.isAccept(event)) {
+        if (event.isAutoRepeat) {
+            return;
+        }
+
+        if (api.keys.isAccept(event)) {
             naviSound.play();
             event.accepted = true;
             collectionsVisible = false;
@@ -137,6 +141,16 @@ PathView {
             gamesVisible = true;
             gamesFocused = true;
             gameListView.forceActiveFocus();
+        }
+        else if (api.keys.isNextPage(event)) {
+            naviSound.play();
+            event.accepted = true;
+            incrementCurrentIndex();
+        }
+        else if (api.keys.isPrevPage(event)) {
+            naviSound.play();
+            event.accepted = true;
+            decrementCurrentIndex();
         }
     }
 

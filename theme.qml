@@ -85,19 +85,6 @@ FocusScope {
         }
     }
 
-    Connections {
-        target: systemView
-        function onCurrentIndexChanged() {
-            if (systemView.currentIndex >= 0) {
-                const selectedCollection = api.collections.get(systemView.currentIndex);
-                proxyModel.sourceModel = selectedCollection.games;
-                gameListView.currentIndex = 0;
-                game = proxyModel.get(gameListView.currentIndex);
-                gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/nofound.png";
-            }
-        }
-    }
-
     Rectangle {
         id: background
         anchors.fill: parent
@@ -335,6 +322,21 @@ FocusScope {
             border.color: "transparent"
         }
 
+        GameListView {
+            id: gameListView
+            opacity: gamesVisible ? 1 : 0
+            visible: gamesVisible
+            Behavior on opacity {
+                NumberAnimation { duration: 300 }
+            }
+        }
+
+        GameMedia {
+            id: gameImage
+            visible: gamesVisible
+        }
+
+
         Image {
             id: gamepadImage
             anchors {
@@ -360,188 +362,6 @@ FocusScope {
                 }
             }
             mipmap: true
-        }
-
-        Image {
-            id: gameImage
-            anchors {
-                left: gameRectangle.right
-                right: parent.right
-                leftMargin: 20
-                rightMargin: 20
-                verticalCenter: parent.verticalCenter
-            }
-            height: parent.height * 0.70
-            source: ""
-            fillMode: Image.PreserveAspectFit
-            asynchronous: true
-            mipmap: true
-        }
-
-        ListView {
-            id: gameListView
-            anchors {
-                left: parent.left
-                leftMargin: 20
-                verticalCenter: parent.verticalCenter
-            }
-            width: parent.width * 0.4
-            height: parent.height * 0.72
-            spacing: 5
-            opacity: gamesVisible ? 1 : 0
-            visible: gamesVisible
-            model: proxyModel
-
-            delegate: Item {
-                width: gameListView.width
-                height: 45
-                property var game: null
-
-                Rectangle {
-                    id: highlightRect
-                    anchors.fill: parent
-                    color: gameListView.currentIndex === index ? "yellow" : "transparent"
-                    radius: 5
-                }
-
-                Text {
-                    id: numerator
-                    text: {
-                        let number = (index + 1).toString().padStart(3, "0");
-                        `${number} - ${model.title} ${model.favorite ? "★" : ""}`
-                    }
-                    color: gameListView.currentIndex === index ? "black" : "white"
-                    font.bold: true
-                    font.pixelSize: gameListView.width * 0.05
-                    elide: Text.ElideRight
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: 10
-                    width: parent.width - 20
-                }
-
-                /*Text {
-                 * id: noEnumerator
-                 * text: model.title
-                 * color: gameListView.currentIndex === index ? "black" : "white"
-                 * font.pixelSize: gameListView.width * 0.05
-                 * elide: Text.ElideRight
-                 * anchors.verticalCenter: parent.verticalCenter
-                 * anchors.left: parent.left
-                 * anchors.leftMargin: 10
-                 * width: parent.width - 20
-            } */
-            }
-
-            Behavior on opacity {
-                NumberAnimation { duration: 300 }
-            }
-
-            Text {
-                id: noGamesText
-                text: "No games found"
-                anchors.centerIn: parent
-                visible: proxyModel.count === 0
-                font.pixelSize: root.width *0.02
-                color: "#FFFFFF"
-            }
-
-            focus: gamesFocused
-
-            Keys.onUpPressed: gameListView.decrementCurrentIndex(naviSound.play())
-            Keys.onDownPressed: gameListView.incrementCurrentIndex(naviSound.play())
-
-            Keys.onPressed: function(event) {
-                if (api.keys.isFilters(event)) {
-                    naviSound.play();
-                    root.filterState = (root.filterState + 1) % 3;
-                    gameListView.currentIndex = 0;
-                    if (proxyModel.count === 0) {
-                        gameImage.source = "assets/gamepad/default.png";
-                        game = null;
-                    } else {
-                        game = proxyModel.get(gameListView.currentIndex);
-                        gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/gamepad/default.png";
-                    }
-                    event.accepted = true;
-
-                } else if (!event.isAutoRepeat && api.keys.isCancel(event)) {
-                    naviSound.play();
-                    event.accepted = true;
-                    collectionsVisible = true;
-                    collectionsFocused = true;
-                    gamesVisible = false;
-                    gamesFocused = false;
-                    systemView.forceActiveFocus();
-
-                } else if (!event.isAutoRepeat && api.keys.isAccept(event)) {
-                    naviSound.play();
-                    event.accepted = true;
-                    const currentCollection = api.collections.get(systemView.currentIndex);
-                    if (currentCollection && currentCollection.games) {
-                        const filteredGame = proxyModel.get(gameListView.currentIndex);
-                        if (filteredGame) {
-                            let originalGameIndex = -1;
-                            for (let i = 0; i < currentCollection.games.count; i++) {
-                                const game = currentCollection.games.get(i);
-                                if (game.title === filteredGame.title) {
-                                    originalGameIndex = i;
-                                    break;
-                                }
-                            }
-                            console.log("Colección actual:", currentCollection.name);
-                            console.log("Título del juego filtrado:", filteredGame.title);
-                            if (originalGameIndex !== -1) {
-                                const gameToLaunch = currentCollection.games.get(originalGameIndex);
-                                console.log("Lanzando juego:", gameToLaunch.title);
-                                gameToLaunch.launch();
-                            } else {
-                                console.log("No se encontró el juego en la colección original");
-                            }
-                        } else {
-                            console.log("No se pudo obtener el juego del modelo filtrado");
-                        }
-                    } else {
-                        console.log("No se pudo obtener la colección actual o sus juegos");
-                    }
-
-                } else if (!event.isAutoRepeat && api.keys.isDetails(event)) {
-                    faviSound.play();
-                    const currentCollection = api.collections.get(systemView.currentIndex);
-                    if (currentCollection && currentCollection.games) {
-                        const filteredGame = proxyModel.get(gameListView.currentIndex);
-                        if (filteredGame) {
-                            let originalGameIndex = -1;
-                            for (let i = 0; i < currentCollection.games.count; i++) {
-                                const game = currentCollection.games.get(i);
-                                if (game.title === filteredGame.title) {
-                                    originalGameIndex = i;
-                                    break;
-                                }
-                            }
-                            if (originalGameIndex !== -1) {
-                                const gameToToggleFavorite = currentCollection.games.get(originalGameIndex);
-                                gameToToggleFavorite.favorite = !gameToToggleFavorite.favorite;
-                                proxyModel.invalidate();
-                                console.log(`Juego '${gameToToggleFavorite.title}' ${gameToToggleFavorite.favorite ? 'agregado a favoritos' : 'eliminado de favoritos'}`);
-                            } else {
-                                console.log("No se encontró el juego en la colección original");
-                            }
-                        }
-                    }
-                    event.accepted = true;
-                }
-            }
-
-            onCurrentIndexChanged: {
-                if (proxyModel.count === 0) {
-                    gameImage.source = "assets/gamepad/default.png";
-                    game = null;
-                } else {
-                    game = proxyModel.get(gameListView.currentIndex);
-                    gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/gamepad/default.png";
-                }
-            }
         }
 
         Item {
@@ -613,6 +433,7 @@ FocusScope {
                     running: !gamesVisible
                 }
 
+
                 Row {
                     id: row1
                     spacing: root.width * 0.001
@@ -642,6 +463,24 @@ FocusScope {
                     }
                     Text {
                         text: "OK"
+                        color: "white"
+                        font.pixelSize: root.width * 0.015
+                        font.bold: true
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    id: row0
+                    spacing: root.width * 0.001
+                    Image {
+                        source: "assets/icons/choose.png"
+                        width: root.width * 0.03
+                        height: root.width * 0.03
+                        mipmap: true
+                    }
+                    Text {
+                        text: "Switch Media"
                         color: "white"
                         font.pixelSize: root.width * 0.015
                         font.bold: true
@@ -688,17 +527,22 @@ FocusScope {
         }
     }
 
+
     Connections {
         target: proxyModel
         function onCountChanged() {
-            if (proxyModel.count === 0) {
-                gameImage.source = "assets/gamepad/default.png";
-                game = null;
-            } else {
-                if (gameListView.currentIndex >= 0) {
-                    game = proxyModel.get(gameListView.currentIndex);
-                    gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/gamepad/default.png";
-                }
+            gameListView.updateGameImage();
+        }
+    }
+
+    Connections {
+        target: systemView
+        function onCurrentIndexChanged() {
+            if (systemView.currentIndex >= 0) {
+                const selectedCollection = api.collections.get(systemView.currentIndex);
+                proxyModel.sourceModel = selectedCollection.games;
+                gameListView.currentIndex = 0;
+                gameListView.updateGameImage();
             }
         }
     }
