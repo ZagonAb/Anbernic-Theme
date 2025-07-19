@@ -135,6 +135,9 @@ PathView {
 
         if (api.keys.isAccept(event)) {
             naviSound.play();
+            if (gameImage.videoLoader) {
+                gameImage.videoLoader.active = true;
+            }
             event.accepted = true;
             collectionsVisible = false;
             collectionsFocused = false;
@@ -160,6 +163,11 @@ PathView {
         currentCollectionName = model.get(currentIndex).name;
         currentShortName = model.get(currentIndex).shortName;
         root.backgroundColor = getColorForSystem(currentShortName);
+
+        if (gameImage && gameImage.isVideoType && gameImage.resetMedia) {
+            gameImage.resetMedia();
+        }
+        proxyModel.invalidate();
     }
 
     Component.onCompleted: {
@@ -170,6 +178,5 @@ PathView {
         currentShortName = model.get(currentIndex).shortName;
         root.backgroundColor = getColorForSystem(currentShortName);
         game = proxyModel.get(gameListView.currentIndex);
-        gameImage.source = game && game.assets.boxFront ? game.assets.boxFront : "assets/nofound.png";
     }
 }

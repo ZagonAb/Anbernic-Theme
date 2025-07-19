@@ -99,6 +99,7 @@ FocusScope {
         source: "assets/sound/mov.wav"
         volume: 0.5
     }
+
     SoundEffect {
         id: faviSound
         source: "assets/sound/fav.wav"
@@ -318,7 +319,7 @@ FocusScope {
             height: parent.height * 0.80
             color: "black"
             opacity: 0.2
-            radius: 5
+            radius: 10
             border.color: "transparent"
         }
 
@@ -334,34 +335,6 @@ FocusScope {
         GameMedia {
             id: gameImage
             visible: gamesVisible
-        }
-
-
-        Image {
-            id: gamepadImage
-            anchors {
-                left: gameRectangle.right
-                right: parent.right
-                leftMargin: 20
-                rightMargin: 20
-                verticalCenter: parent.verticalCenter
-            }
-            height: parent.height * 0.50
-            source: {
-                if (systemView.model && systemView.model.shortName) {
-                    return "assets/gamepad/" + systemView.model.shortName + ".png"
-                }
-                return "assets/gamepad/default.png"
-            }
-            fillMode: Image.PreserveAspectFit
-            asynchronous: true
-            visible: !gameImage.source || gameImage.status === Image.Error
-            onStatusChanged: {
-                if (status === Image.Error) {
-                    source = "assets/gamepad/default.png";
-                }
-            }
-            mipmap: true
         }
 
         Item {

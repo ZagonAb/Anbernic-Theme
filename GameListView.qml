@@ -17,11 +17,12 @@ ListView {
 
     property var game: null
     property string currentGameImageSource: ""
-
     property int currentMediaType: 0
-    property var mediaSources: ["boxFront", "screenshot"]
+    property var availableMediaTypes: []
 
     signal updateImageSource(string source)
+    signal updateMediaType(int mediaType)
+    signal updateAvailableMediaTypes(var types)
 
     delegate: Item {
         width: gameListView.width
@@ -32,7 +33,7 @@ ListView {
             id: highlightRect
             anchors.fill: parent
             color: gameListView.currentIndex === index ? "yellow" : "transparent"
-            radius: 5
+            radius: 10
         }
 
         Text {
@@ -83,9 +84,11 @@ ListView {
                 updateGameImage();
                 event.accepted = true;
                 break;
-
             case api.keys.isCancel(event):
                 naviSound.play();
+                if (gameImage && gameImage.isVideoType) {
+                    gameImage.resetMedia();
+                }
                 event.accepted = true;
                 collectionsVisible = true;
                 collectionsFocused = true;
@@ -108,35 +111,144 @@ ListView {
 
             case (event.key === Qt.Key_Left):
                 naviSound.play();
-                currentMediaType = 0;
-                updateGameImage();
+                if (availableMediaTypes.length > 0) {
+                    currentMediaType = (currentMediaType - 1 + availableMediaTypes.length) % availableMediaTypes.length;
+                    currentGameImageSource = "";
+                    Qt.callLater(function() {
+                        updateGameImage();
+                    });
+                }
                 event.accepted = true;
                 break;
 
             case (event.key === Qt.Key_Right):
                 naviSound.play();
-                currentMediaType = 1;
-                updateGameImage();
+                if (availableMediaTypes.length > 0) {
+                    currentMediaType = (currentMediaType + 1) % availableMediaTypes.length;
+                    currentGameImageSource = "";
+                    Qt.callLater(function() {
+                        updateGameImage();
+                    });
+                }
                 event.accepted = true;
                 break;
         }
     }
 
+    function getFirstAvailableMedia() {
+        if (!game || !game.assets) return "assets/gamepad/default.png";
+
+        for (let i = 0; i < availableMediaTypes.length; i++) {
+            const mediaType = availableMediaTypes[i];
+            if (game.assets[mediaType]) {
+                return game.assets[mediaType];
+            }
+        }
+        return "assets/gamepad/default.png";
+    }
+
+    function getAvailableMediaTypes() {
+        if (!game || !game.assets) return [];
+
+        const allMediaTypes = [
+            "boxFront", "boxBack", "boxSpine", "boxFull", "cartridge", "logo",
+            "marquee", "bezel", "panel", "cabinetLeft", "cabinetRight",
+            "tile", "banner", "steam", "poster", "background",
+            "screenshot", "titlescreen", "video"
+        ];
+
+        const available = [];
+        for (let i = 0; i < allMediaTypes.length; i++) {
+            const mediaType = allMediaTypes[i];
+            if (game.assets[mediaType]) {
+                available.push(mediaType);
+            }
+        }
+
+        available.push("info");
+
+        return available.length > 0 ? available : ["boxFront"];
+    }
+
     function updateGameImage() {
+        if (gameImage && gameImage.videoLoader && gameImage.videoLoader.item && gameImage.videoLoader.item.mediaPlayer) {
+            gameImage.videoLoader.item.mediaPlayer.stop();
+        }
+
         if (proxyModel.count === 0) {
             currentGameImageSource = "assets/gamepad/default.png";
             game = null;
+            availableMediaTypes = [];
+            if (gameImage && gameImage.videoLoader) {
+                gameImage.videoLoader.active = false;
+            }
+            if (gameImage && gameImage.infoLoader) {
+                gameImage.infoLoader.active = false;
+            }
         } else {
             game = proxyModel.get(currentIndex);
-            if (game && game.assets) {
-                currentGameImageSource = game.assets[mediaSources[currentMediaType]] ?
-                game.assets[mediaSources[currentMediaType]] :
-                "assets/gamepad/default.png";
-            } else {
-                currentGameImageSource = "assets/gamepad/default.png";
-            }
+            availableMediaTypes = getAvailableMediaTypes();
+
+            if (availableMediaTypes.length === 0 ||
+                (availableMediaTypes.length === 1 && availableMediaTypes[0] === "info")) {
+                currentGameImageSource = "";
+            currentMediaType = availableMediaTypes.indexOf("info") >= 0 ?
+            availableMediaTypes.indexOf("info") : 0;
+            updateImageSource(currentGameImageSource);
+            updateMediaType(currentMediaType);
+            updateAvailableMediaTypes(availableMediaTypes);
+            return;
+                }
+
+                if (game && game.assets) {
+                    let attemptedMediaType = currentMediaType;
+                    if (attemptedMediaType >= availableMediaTypes.length) {
+                        attemptedMediaType = 0;
+                        currentMediaType = 0;
+                    }
+
+                    const mediaType = availableMediaTypes[attemptedMediaType];
+
+                    if (mediaType === "info") {
+                        currentGameImageSource = "";
+                    } else if (game.assets[mediaType]) {
+                        currentGameImageSource = game.assets[mediaType];
+                    } else {
+                        for (let i = 0; i < availableMediaTypes.length; i++) {
+                            const fallbackType = availableMediaTypes[i];
+                            if (fallbackType !== "info" && game.assets[fallbackType]) {
+                                currentGameImageSource = game.assets[fallbackType];
+                                attemptedMediaType = i;
+                                break;
+                            }
+                        }
+
+                        if (!currentGameImageSource) {
+                            if (availableMediaTypes.includes("info")) {
+                                currentGameImageSource = "";
+                                attemptedMediaType = availableMediaTypes.indexOf("info");
+                            } else {
+                                currentGameImageSource = "assets/gamepad/default.png";
+                                attemptedMediaType = 0;
+                            }
+                        }
+                    }
+
+                    currentMediaType = attemptedMediaType;
+                } else {
+                    if (availableMediaTypes.includes("info")) {
+                        currentGameImageSource = "";
+                        currentMediaType = availableMediaTypes.indexOf("info");
+                    } else {
+                        currentGameImageSource = "assets/gamepad/default.png";
+                        currentMediaType = 0;
+                    }
+                }
         }
+
         updateImageSource(currentGameImageSource);
+        updateMediaType(currentMediaType);
+        updateAvailableMediaTypes(availableMediaTypes);
     }
 
     function handleGameLaunch() {
@@ -180,6 +292,31 @@ ListView {
                 }
             }
         }
+    }
+
+    function getCurrentMediaSource() {
+        if (!game || !game.assets || availableMediaTypes.length === 0) {
+            return "assets/gamepad/default.png";
+        }
+
+        const mediaType = availableMediaTypes[currentMediaType];
+        if (game.assets[mediaType]) {
+            return game.assets[mediaType];
+        }
+
+        return getFirstAvailableMedia();
+    }
+
+    function getFirstAvailableNonVideoMedia() {
+        if (!game || !game.assets) return "assets/gamepad/default.png";
+
+        for (let i = 0; i < availableMediaTypes.length; i++) {
+            const mediaType = availableMediaTypes[i];
+            if (mediaType !== "video" && game.assets[mediaType]) {
+                return game.assets[mediaType];
+            }
+        }
+        return "assets/gamepad/default.png";
     }
 
     onCurrentIndexChanged: {
