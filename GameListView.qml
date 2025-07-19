@@ -112,11 +112,12 @@ ListView {
             case (event.key === Qt.Key_Left):
                 naviSound.play();
                 if (availableMediaTypes.length > 0) {
+                    if (gameImage && gameImage.isVideoType) {
+                        gameImage.resetMedia();
+                    }
                     currentMediaType = (currentMediaType - 1 + availableMediaTypes.length) % availableMediaTypes.length;
                     currentGameImageSource = "";
-                    Qt.callLater(function() {
-                        updateGameImage();
-                    });
+                    updateGameImage();
                 }
                 event.accepted = true;
                 break;

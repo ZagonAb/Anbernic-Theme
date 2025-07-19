@@ -53,19 +53,19 @@ Item {
         target: gameListView
         function onUpdateImageSource(newSource) {
             if (currentSource === newSource) return;
-            if (isVideoType && videoLoader.item && videoLoader.item.mediaPlayer) {
-                videoLoader.item.mediaPlayer.stop();
+
+            if (isVideoType) {
+                resetMedia();
             }
+
             currentSource = newSource;
+
             if (availableMediaTypes[currentMediaType] === "video" || newSource.endsWith(".mp4") || newSource.endsWith(".avi")) {
                 gameImage.source = "";
-                if (videoLoader.active) videoLoader.active = false;
-                Qt.callLater(function() { videoLoader.active = true; });
-            }
-            else {
-                if (videoLoader.active) videoLoader.active = false;
-                gameImage.source = "";
-                Qt.callLater(function() { gameImage.source = currentSource; });
+                videoLoader.active = true;
+            } else {
+                videoLoader.active = false;
+                gameImage.source = currentSource;
             }
         }
 
@@ -175,10 +175,17 @@ Item {
                     }
                 }
 
+                onVisibleChanged: {
+                    if (!visible && player.playbackState === MediaPlayer.PlayingState) {
+                        player.stop();
+                    }
+                }
+
                 Component.onDestruction: {
                     if (player.playbackState === MediaPlayer.PlayingState) {
                         player.stop();
                     }
+                    player.source = "";
                 }
             }
         }
@@ -283,6 +290,7 @@ Item {
             videoLoader.item.mediaPlayer.stop();
             videoLoader.item.mediaPlayer.source = "";
             videoLoader.active = false;
+            isVideoType = false;
         }
     }
 
