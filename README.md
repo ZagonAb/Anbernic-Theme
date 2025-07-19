@@ -2,7 +2,6 @@
 
 - A theme for Pegasus Frontend.
 
-- Inspired by the Anbernic RG406V interface.
 > ⚠️ The theme will be subject to future updates with the intention of improving the user experience.
 
 ![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/2442482b91714aa84596f498c2f45872d8638005/.meta/screenshots/screen0.png)
