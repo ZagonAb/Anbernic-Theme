@@ -97,7 +97,7 @@ FocusScope {
     SoundEffect {
         id: naviSound
         source: "assets/sound/mov.wav"
-        volume: 0.15
+        volume: 0.05
     }
 
     SoundEffect {

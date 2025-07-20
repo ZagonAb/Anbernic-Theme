@@ -2,7 +2,6 @@ import QtQuick 2.15
 import QtMultimedia 5.8
 import QtQuick.Layouts 1.15
 import QtGraphicalEffects 1.12
-
 Item {
     id: musicPlayer
     width: parent.width
@@ -10,6 +9,7 @@ Item {
     z: 999
     property bool isPlaying: false
     property real volume: 0.03
+    property real displayVolume: Math.pow(volume, 0.3)
     property int currentTrackIndex: 0
     property string currentTrackName: ""
     property real trackDuration: 0
@@ -211,6 +211,7 @@ Item {
             lastVolumeBeforeMute = newVolume
         }
         volume = Math.max(0, Math.min(1, newVolume))
+        displayVolume = Math.pow(volume, 0.3)
         audioPlayer.volume = volume
     }
 
@@ -441,7 +442,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     Rectangle {
-                        width: parent.width * musicPlayer.volume
+                        width: parent.width * musicPlayer.displayVolume
                         height: parent.height
                         color: "white"
                         radius: parent.radius
@@ -450,13 +451,15 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            const newVolume = mouse.x / parent.width
+                            const displayPosition = mouse.x / parent.width
+                            const newVolume = Math.pow(displayPosition, 3.33)
                             musicPlayer.setVolume(newVolume)
                         }
 
                         onPositionChanged: {
                             if (pressed) {
-                                const newVolume = Math.max(0, Math.min(1, mouse.x / parent.width))
+                                const displayPosition = Math.max(0, Math.min(1, mouse.x / parent.width))
+                                const newVolume = Math.pow(displayPosition, 3.33)
                                 musicPlayer.setVolume(newVolume)
                             }
                         }

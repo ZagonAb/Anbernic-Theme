@@ -41,7 +41,25 @@ Item {
     }
 
     property real savedVolume: api.memory.has("volume") ? api.memory.get("volume") : 0.03
+    property real displayVolume: Math.pow(savedVolume, 0.3)
     property bool isMuted: api.memory.has("muted") ? api.memory.get("muted") : false
+
+    function displayToVolume(displayPos) {
+        return Math.pow(displayPos, 3.33)
+    }
+
+    function setVideoVolume(newVolume) {
+        savedVolume = Math.max(0.01, Math.min(1.0, newVolume))
+        displayVolume = Math.pow(savedVolume, 0.3)
+        api.memory.set("volume", savedVolume)
+
+        if (videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0) {
+            var videoOutput = videoLoader.item.children[0]
+            if (videoOutput && videoOutput.mediaPlayer && !isMuted) {
+                videoOutput.mediaPlayer.volume = savedVolume
+            }
+        }
+    }
 
     Loader {
         id: infoLoader
@@ -241,6 +259,7 @@ Item {
                             Behavior on opacity {
                                 NumberAnimation { duration: 150 }
                             }
+                            mipmap: true
                         }
 
                         MouseArea {
@@ -280,7 +299,7 @@ Item {
                                 horizontalCenter: parent.horizontalCenter
                             }
                             width: parent.width
-                            height: parent.height * (isMuted ? 0 : savedVolume)
+                            height: parent.height * (isMuted ? 0 : displayVolume)
                             radius: width / 2
                             color: isMuted ? "#FF6B6B" : "#FFFFFF"
 
@@ -295,7 +314,7 @@ Item {
                         Rectangle {
                             id: volumeHandle
                             anchors.horizontalCenter: parent.horizontalCenter
-                            y: parent.height * (1 - (isMuted ? 0 : savedVolume)) - height / 2
+                            y: parent.height * (1 - (isMuted ? 0 : displayVolume)) - height / 2
                             width: 15
                             height: 15
                             radius: 6
@@ -323,10 +342,9 @@ Item {
 
                             onPositionChanged: {
                                 if (pressed) {
-                                    var newVolume = 1.0 - Math.max(0, Math.min(1, mouseY / volumeSlider.height));
-                                    newVolume = Math.max(0.01, Math.min(1.0, newVolume));
-                                    savedVolume = newVolume;
-                                    api.memory.set("volume", savedVolume);
+                                    var displayPosition = 1.0 - Math.max(0, Math.min(1, mouseY / volumeSlider.height));
+                                    var newVolume = displayToVolume(displayPosition);
+                                    setVideoVolume(newVolume);
 
                                     if (!isMuted) {
                                         player.volume = savedVolume;
