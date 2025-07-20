@@ -14,9 +14,9 @@
 
 ## Step-by-Step Guide
 1. **Copy your MP3 file** to the music folder:
-2. **Edit the MusicPlayer.qml file**:
-3. **Locate the tracks list**:
-4. **Add your new track**:
+2. **Edit the MusicPlayer.qml file**
+3. **Locate the tracks list**: function loadMusicList()
+4. **Add your new track**: "assets/music/your music.mp3"
 
 # Short name icons
 - The PathView [images](https://github.com/ZagonAb/Systems-Arts-consoles) have been recreated trying to maintain the greatest possible fidelity to the original style.
