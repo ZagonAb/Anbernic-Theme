@@ -13,10 +13,19 @@
 # Music Player - How to Add New Songs
 
 ## Step-by-Step Guide
-1. **Copy your MP3 file** to the music folder: `assets/music`
+
+1. **Copy your MP3 file** to the music folder: `assets/music/`
+   - Recommended: Use simple filenames without spaces (e.g., `My_Song.mp3`)
+
 2. **Edit the MusicPlayer.qml file**
-3. **Locate the tracks list**: `function loadMusicList()`
-4. **Add your new track**: `"assets/music/your music.mp3"`
+   - Locate the music list in: `function loadMusicList()`
+
+3. **Add your new track** following this format:
+   ```javascript
+   var hardcodedTracks = [
+       "assets/music/Sled Storm.mp3",   // Note: Comma added here
+       "assets/music/Your_New_Song.mp3"   // Last entry NEVER has comma
+   ]
 
 # Short name icons
 - The PathView [images](https://github.com/ZagonAb/Systems-Arts-consoles) have been recreated trying to maintain the greatest possible fidelity to the original style.
