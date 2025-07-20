@@ -104,7 +104,7 @@ Item {
                                 id: metaLabel
                                 width: parent.width
                                 font {
-                                    pixelSize: contentBounds.height * 0.02
+                                    pixelSize: contentBounds.height * 0.03
                                     bold: true
                                     family: global.fonts.sans
                                 }
@@ -117,7 +117,7 @@ Item {
                                 id: metaValue
                                 width: parent.width
                                 font {
-                                    pixelSize: contentBounds.height * 0.022
+                                    pixelSize: contentBounds.height * 0.03
                                     family: global.fonts.sans
                                 }
                                 color: textColor
@@ -168,7 +168,7 @@ Item {
                                         text: game ? Math.round(game.rating * 100) + "%" : "0%"
                                         color: textColor
                                         font {
-                                            pixelSize: contentBounds.height * 0.025
+                                            pixelSize: contentBounds.height * 0.03
                                             bold: true
                                         }
                                         visible: false
@@ -179,7 +179,7 @@ Item {
                                         id: starsRepeater
                                         model: 5
                                         Image {
-                                            width: contentBounds.height * 0.025
+                                            width: contentBounds.height * 0.035
                                             height: width
                                             source: {
                                                 if (!game) return "assets/icons/star0.png";

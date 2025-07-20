@@ -97,13 +97,13 @@ FocusScope {
     SoundEffect {
         id: naviSound
         source: "assets/sound/mov.wav"
-        volume: 0.5
+        volume: 0.15
     }
 
     SoundEffect {
         id: faviSound
         source: "assets/sound/fav.wav"
-        volume: 0.5
+        volume: 0.3
     }
 
     Text {
@@ -285,7 +285,7 @@ FocusScope {
 
                         Image {
                             id: collectionImage
-                            source: "assets/shortnames/" + currentShortName + ".png"
+                            source: currentShortName ? "assets/shortnames/" + currentShortName + ".png" : ""
                             width: parent.width
                             height: parent.height
                             fillMode: Image.PreserveAspectFit
@@ -382,21 +382,25 @@ FocusScope {
 
             Row {
                 id: mainRow
-                spacing: root.width * 0.01
+                spacing: root.width * 0.005
+
+
                 anchors {
                     right: parent.right
-                    rightMargin: parent.width * 0.1
+                    rightMargin: root.width * 0.28
+                    verticalCenter: parent.verticalCenter
                 }
-                y: gamesVisible ? parent.height - height : parent.height
+                y: gamesVisible ? 0 : parent.height
 
                 SequentialAnimation on y {
                     NumberAnimation {
-                        to: parent.height - height
+                        to: 0
                         duration: 300
                         easing.type: Easing.OutCubic
                     }
                     running: gamesVisible
                 }
+
                 SequentialAnimation on y {
                     NumberAnimation {
                         to: parent.height
@@ -406,20 +410,19 @@ FocusScope {
                     running: !gamesVisible
                 }
 
-
                 Row {
                     id: row1
                     spacing: root.width * 0.001
                     Image {
                         source: "assets/icons/x.png"
-                        width: root.width * 0.03
-                        height: root.width * 0.03
+                        width: root.width * 0.022
+                        height: root.width * 0.022
                         mipmap: true
                     }
                     Text {
                         text: "Favorite"
                         color: "white"
-                        font.pixelSize: root.width * 0.015
+                        font.pixelSize: root.width * 0.011
                         font.bold: true
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -430,32 +433,14 @@ FocusScope {
                     spacing: root.width * 0.001
                     Image {
                         source: "assets/icons/a.png"
-                        width: root.width * 0.03
-                        height: root.width * 0.03
+                        width: root.width * 0.022
+                        height: root.width * 0.022
                         mipmap: true
                     }
                     Text {
                         text: "OK"
                         color: "white"
-                        font.pixelSize: root.width * 0.015
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Row {
-                    id: row0
-                    spacing: root.width * 0.001
-                    Image {
-                        source: "assets/icons/choose.png"
-                        width: root.width * 0.03
-                        height: root.width * 0.03
-                        mipmap: true
-                    }
-                    Text {
-                        text: "Switch Media"
-                        color: "white"
-                        font.pixelSize: root.width * 0.015
+                        font.pixelSize: root.width * 0.011
                         font.bold: true
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -466,14 +451,14 @@ FocusScope {
                     spacing: root.width * 0.001
                     Image {
                         source: "assets/icons/y.png"
-                        width: root.width * 0.03
-                        height: root.width * 0.03
+                        width: root.width * 0.022
+                        height: root.width * 0.022
                         mipmap: true
                     }
                     Text {
                         text: "Filter"
                         color: "white"
-                        font.pixelSize: root.width * 0.015
+                        font.pixelSize: root.width * 0.011
                         font.bold: true
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -484,14 +469,14 @@ FocusScope {
                     spacing: root.width * 0.001
                     Image {
                         source: "assets/icons/b.png"
-                        width: root.width * 0.03
-                        height: root.width * 0.03
+                        width: root.width * 0.022
+                        height: root.width * 0.022
                         mipmap: true
                     }
                     Text {
                         text: "Back"
                         color: "white"
-                        font.pixelSize: root.width * 0.015
+                        font.pixelSize: root.width * 0.011
                         font.bold: true
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -500,6 +485,118 @@ FocusScope {
         }
     }
 
+    MusicPlayer {
+        id: musicPlayer
+        width: parent.width * 0.25
+        height: parent.height * 0.08
+        anchors {
+            right: parent.right
+            rightMargin: parent.width * 0.02
+            bottom: parent.bottom
+            bottomMargin: 5
+        }
+        z: 999
+    }
+
+    Item {
+        id: musicControls
+        width: parent.width * 0.25
+        height: parent.height * 0.06
+        anchors {
+            right: parent.right
+            rightMargin: parent.width * 0.02
+            bottom: musicPlayer.top
+        }
+        z: 999
+
+        Row {
+            anchors.centerIn: parent
+            spacing: 15
+
+            Row {
+                spacing: 8
+                anchors.verticalCenter: parent.verticalCenter
+
+                Rectangle {
+                    width: 40
+                    height: 25
+                    radius: 12
+                    color: "#333333"
+                    border.color: "#555555"
+                    border.width: 1
+
+                    Text {
+                        text: "LT"
+                        color: "white"
+                        font.pixelSize: 14
+                        font.bold: true
+                        anchors.centerIn: parent
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: musicPlayer.previousTrack()
+                    }
+                }
+
+                Text {
+                    text: "Previous Music"
+                    color: "white"
+                    font.pixelSize: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            Row {
+                spacing: 8
+                anchors.verticalCenter: parent.verticalCenter
+
+                Rectangle {
+                    width: 40
+                    height: 25
+                    radius: 12
+                    color: "#333333"
+                    border.color: "#555555"
+                    border.width: 1
+
+                    Text {
+                        text: "RT"
+                        color: "white"
+                        font.pixelSize: 14
+                        font.bold: true
+                        anchors.centerIn: parent
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: musicPlayer.nextTrack()
+                    }
+                }
+
+                Text {
+                    text: "Next Music"
+                    color: "white"
+                    font.pixelSize: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+    }
+
+    Keys.onPressed: {
+        if (event.isAutoRepeat) {
+            return;
+        }
+
+        if (api.keys.isPageUp(event)) {
+            event.accepted = true;
+            musicPlayer.nextTrack();
+        }
+        else if (api.keys.isPageDown(event)) {
+            event.accepted = true;
+            musicPlayer.previousTrack();
+        }
+    }
 
     Connections {
         target: proxyModel

@@ -10,6 +10,14 @@
 
 ![screen2](https://github.com/ZagonAb/Anbernic-Theme/blob/2442482b91714aa84596f498c2f45872d8638005/.meta/screenshots/screen2.png)
 
+# Music Player - How to Add New Songs
+
+## Step-by-Step Guide
+1. **Copy your MP3 file** to the music folder:
+2. **Edit the MusicPlayer.qml file**:
+3. **Locate the tracks list**:
+4. **Add your new track**:
+
 # Short name icons
 - The PathView [images](https://github.com/ZagonAb/Systems-Arts-consoles) have been recreated trying to maintain the greatest possible fidelity to the original style.
 
