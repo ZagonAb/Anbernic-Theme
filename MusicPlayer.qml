@@ -437,7 +437,7 @@ Item {
                     width: parent.width * 0.7
                     height: musicPlayer.height * 0.15
                     color: "gray"
-                    opacity: 0.5
+                    opacity: 0.8
                     radius: height / 2
                     anchors.verticalCenter: parent.verticalCenter
 
@@ -446,6 +446,16 @@ Item {
                         height: parent.height
                         color: "white"
                         radius: parent.radius
+                    }
+
+                    Rectangle {
+                        width: height * 1.0
+                        height: parent.height * 1.8
+                        radius: width / 2
+                        color: "white"
+                        x: parent.width * musicPlayer.displayVolume - width/2
+                        y: (parent.height - height) / 2
+                        visible: parent.width > 0
                     }
 
                     MouseArea {

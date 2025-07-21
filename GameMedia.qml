@@ -220,7 +220,7 @@ Item {
                         rightMargin: parent.width * 0.05
                         verticalCenter: parent.verticalCenter
                     }
-                    width: 40
+                    width: parent.width * 0.04
                     height: parent.height * 0.6
                     visible: videoOutput.visible
 
@@ -228,7 +228,7 @@ Item {
                         id: volumeBackground
                         anchors.fill: parent
                         radius: 8
-                        color: "#40000000"
+                        color: "#60000000"
                         border.color: "#60FFFFFF"
                         border.width: 1
                         opacity: volumeMouseArea.containsMouse || muteButton.hovered ? 1.0 : 0.3
@@ -245,8 +245,8 @@ Item {
                             topMargin: 8
                             horizontalCenter: parent.horizontalCenter
                         }
-                        width: 24
-                        height: 24
+                        width: parent.width * 0.6
+                        height: width
 
                         property bool hovered: muteMouseArea.containsMouse
 
@@ -283,7 +283,7 @@ Item {
                             bottomMargin: 8
                             horizontalCenter: parent.horizontalCenter
                         }
-                        width: 10
+                        width: parent.width * 0.5
 
                         Rectangle {
                             id: volumeTrack
@@ -315,9 +315,9 @@ Item {
                             id: volumeHandle
                             anchors.horizontalCenter: parent.horizontalCenter
                             y: parent.height * (1 - (isMuted ? 0 : displayVolume)) - height / 2
-                            width: 15
-                            height: 15
-                            radius: 6
+                            width: parent.width * 1.5
+                            height: width
+                            radius: width / 2
                             color: volumeHandleArea.pressed ? "#FFFFFF" : "#E0E0E0"
                             border.color: "#80000000"
                             border.width: 1
