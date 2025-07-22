@@ -8,7 +8,7 @@
 
 ![screen1](https://github.com/ZagonAb/Anbernic-Theme/blob/01ac7c262834524683c913f335ce5d3c2463d312/.meta/screenshots/screen1.png)
 
-![screen2](https://github.com/ZagonAb/Anbernic-Theme/blob/01ac7c262834524683c913f335ce5d3c2463d312/.meta/screenshots/screen2.png)
+![screen2](https://github.com/ZagonAb/Anbernic-Theme/blob/b31625b21662386c5f3ae854914e066426995e75/.meta/screenshots/screen2.png)
 
 # Music Player - How to Add New Songs
 
