@@ -2,7 +2,7 @@
 
 - A theme for Pegasus Frontend.
 
-> ⚠️ The theme will be subject to future updates with the intention of improving the user experience.
+> 📢 No more updates for now, but if you have any suggestions, they're very welcome!
 
 ![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/01ac7c262834524683c913f335ce5d3c2463d312/.meta/screenshots/screen0.png)
 

@@ -308,6 +308,7 @@ Item {
                         lineHeight: 1.4
                         textFormat: Text.RichText
                         onLinkActivated: Qt.openUrlExternally(link)
+                        topPadding: contentBounds.height * 0.02
 
                         layer.enabled: true
                         layer.effect: DropShadow {
