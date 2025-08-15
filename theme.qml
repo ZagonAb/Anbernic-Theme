@@ -115,7 +115,7 @@ FocusScope {
             leftMargin: 20
         }
         color: "white"
-        font.pixelSize: root.width * 0.02
+        font.pixelSize: root.width * 0.025
         font.bold: true
         visible: collectionsVisible
 
@@ -145,7 +145,7 @@ FocusScope {
         height: 40
         anchors {
             top: parent.top
-            topMargin: 20
+            topMargin: root.height * 0.04
         }
 
         Timer {
@@ -168,8 +168,8 @@ FocusScope {
             Image {
                 id: batteryIcon
                 source: getBatteryIcon()
-                width: batteryIndicator.width * 0.1
-                height: root.height * 0.04
+                width: root.width * 0.1
+                height: root.height * 0.05
                 fillMode: Image.PreserveAspectFit
                 mipmap: true
                 asynchronous: true

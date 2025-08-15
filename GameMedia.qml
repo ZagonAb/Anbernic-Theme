@@ -44,6 +44,14 @@ Item {
     property real displayVolume: Math.pow(savedVolume, 0.3)
     property bool isMuted: api.memory.has("muted") ? api.memory.get("muted") : false
 
+    property alias filterBlockedNotification: filterBlockedNotification
+    property bool isVideoPlaying: videoLoader.active && videoLoader.item && videoLoader.item.children &&
+    videoLoader.item.children.length > 0 &&
+    videoLoader.item.children[0].mediaPlayer &&
+    videoLoader.item.children[0].mediaPlayer.playbackState === MediaPlayer.PlayingState
+
+    signal videoPlayingChanged(bool isPlaying)
+
     function displayToVolume(displayPos) {
         return Math.pow(displayPos, 3.33)
     }
@@ -60,6 +68,62 @@ Item {
             }
         }
     }
+
+    Rectangle {
+        id: filterBlockedNotification
+        anchors.centerIn: parent
+        color: "#AA000000"
+        radius: 10
+        border.color: "white"
+        border.width: 2
+        opacity: 0
+        visible: opacity > 0
+        property real horizontalMargin: 20
+        property real verticalMargin: 10
+
+        width: Math.min(
+            messageText.implicitWidth + horizontalMargin * 2,
+            parent.width * 0.8
+        )
+        height: messageText.implicitHeight + verticalMargin * 2
+        z:1
+
+        Text {
+            id: messageText
+            anchors.centerIn: parent
+            width: parent.width - parent.horizontalMargin * 2
+            text: "You can't filter while the video is playing"
+            color: "white"
+            font.pixelSize: 16
+            font.bold: true
+            wrapMode: Text.Wrap
+            horizontalAlignment: Text.AlignHCenter
+        }
+
+        Behavior on opacity {
+            NumberAnimation { duration: 300 }
+        }
+
+        function show() {
+            opacity = 1;
+            hideTimer.restart();
+        }
+
+        Timer {
+            id: hideTimer
+            interval: 2000
+            onTriggered: filterBlockedNotification.opacity = 0
+        }
+    }
+
+    Connections {
+        target: videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0 ?
+        videoLoader.item.children[0].mediaPlayer : null
+        function onPlaybackStateChanged() {
+            videoPlayingChanged(isVideoPlaying);
+        }
+    }
+
 
     Loader {
         id: infoLoader

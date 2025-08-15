@@ -40,7 +40,9 @@ ListView {
             id: numerator
             text: {
                 let number = (index + 1).toString().padStart(3, "0");
-                `${number} - ${model.title} ${model.favorite ? "★" : ""}`
+                let starColor = gameListView.currentIndex === index ? "#FF0000" : "#FFD700";
+                let star = model.favorite ? `<font color="${starColor}">★</font> ` : "";
+                return number + " - " + star + model.title;
             }
             color: gameListView.currentIndex === index ? "black" : "white"
             font.bold: true
@@ -78,6 +80,15 @@ ListView {
 
         switch(true) {
             case api.keys.isFilters(event):
+                if (gameImage && gameImage.isVideoPlaying) {
+                    if (gameImage.filterBlockedNotification) {
+                        gameImage.filterBlockedNotification.show();
+                    } else {
+                        console.log("Filter blocked - video is playing");
+                    }
+                    event.accepted = true;
+                    return;
+                }
                 naviSound.play();
                 root.filterState = (root.filterState + 1) % 3;
                 currentIndex = 0;
