@@ -348,9 +348,9 @@ FocusScope {
                 id: gamesCountText
                 text: {
                     if (gameListView.model.count === 0) {
-                        return "Games 0/0"
+                        return "Game 0/0"
                     }
-                    return "Games " + (gameListView.currentIndex + 1) + "/" + gameListView.model.count
+                    return "Game " + (gameListView.currentIndex + 1) + "/" + gameListView.model.count
                 }
                 font.pixelSize: root.width * 0.015
                 color: "white"

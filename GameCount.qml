@@ -5,11 +5,11 @@ Text {
     anchors {
         bottom: parent.bottom
         horizontalCenter: parent.horizontalCenter
-        bottomMargin: root.width * 0.015
+        bottomMargin: root.width * 0.02
     }
     text: api.collections.get(systemView.currentIndex).games.count + " games"
     color: "white"
-    font.pixelSize: root.width * 0.015
+    font.pixelSize: root.width * 0.02
     font.bold: true
     visible: collectionsVisible
 }

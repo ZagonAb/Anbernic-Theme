@@ -14,8 +14,8 @@ Row {
         model: api.collections.count
 
         Rectangle {
-            width: 8
-            height: 8
+            width: root.width * 0.01
+            height: root.width * 0.01
             radius: width/2
             color: "white"
             border {

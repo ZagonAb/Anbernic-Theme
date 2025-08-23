@@ -94,14 +94,14 @@ PathView {
                 text: modelData.shortName.toUpperCase() || ""
                 color: "white"
                 font.bold: true
-                font.pixelSize: delegateItem.width * 0.1
+                font.pixelSize: delegateItem.width * 0.12
             }
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "(" + getConsoleYear(modelData.shortName) + ")"
                 color: "white"
-                font.pixelSize: delegateItem.width * 0.1
+                font.pixelSize: delegateItem.width * 0.12
                 font.bold: true
             }
         }
