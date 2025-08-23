@@ -4,11 +4,11 @@
 
 > 📢 No more updates for now, but if you have any suggestions, they're very welcome!
 
-![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/4470a5ae9c1f3fa9f1159f58d5f2d2c470656d7f/.meta/screenshots/screen0.png)
+![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/0a2ed611e894a0f866a90a69e63bd5b6ac519aeb/.meta/screenshots/screen0.png)
 
-![screen1](https://github.com/ZagonAb/Anbernic-Theme/blob/4470a5ae9c1f3fa9f1159f58d5f2d2c470656d7f/.meta/screenshots/screen1.png)
+![screen1](https://github.com/ZagonAb/Anbernic-Theme/blob/0a2ed611e894a0f866a90a69e63bd5b6ac519aeb/.meta/screenshots/screen1.png)
 
-![screen2](https://github.com/ZagonAb/Anbernic-Theme/blob/4470a5ae9c1f3fa9f1159f58d5f2d2c470656d7f/.meta/screenshots/screen2.png)
+![screen2](https://github.com/ZagonAb/Anbernic-Theme/blob/0a2ed611e894a0f866a90a69e63bd5b6ac519aeb/.meta/screenshots/screen2.png)
 
 # Music Player - How to Add New Songs
 
