@@ -365,6 +365,7 @@ ListView {
     }
 
     onCurrentIndexChanged: {
+        currentMediaType = 0;
         updateGameImage();
     }
 }

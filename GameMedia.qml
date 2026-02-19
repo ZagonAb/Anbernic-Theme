@@ -120,19 +120,37 @@ Item {
         target: gameListView
 
         function onUpdateImageSource(newSource) {
-            if (currentSource === newSource) return;
+            if (currentSource === newSource && !isVideoType) return;
 
-            if (isVideoType) resetMedia();
+            if (videoLoader.active) {
+                if (videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0) {
+                    var vo = videoLoader.item.children[0];
+                    if (vo && vo.mediaPlayer) {
+                        vo.mediaPlayer.stop();
+                        vo.mediaPlayer.source = "";
+                    }
+                }
+                videoLoader.active = false;
+                isVideoType = false;
+            }
 
             currentSource = newSource;
 
+            if (!newSource || newSource === "") {
+                gameImage.source = "";
+                return;
+            }
+
             var isVid = currentIsVideo() || newSource.endsWith(".mp4") || newSource.endsWith(".avi");
+
             if (isVid) {
                 gameImage.source = "";
-                videoLoader.active = true;
+                gameImage.visible = false;
+                videoReloadTimer.restart();
             } else {
-                videoLoader.active = false;
-                gameImage.source = currentSource;
+                gameImage.visible = true;
+                gameImage.source = "";
+                Qt.callLater(() => { gameImage.source = currentSource; });
             }
         }
 
@@ -144,8 +162,17 @@ Item {
                 gameImage.source = "";
                 gameImage.visible = false;
                 infoLoader.active = false;
-                if (videoLoader.active) videoLoader.active = false;
-                Qt.callLater(() => { videoLoader.active = true; });
+                if (videoLoader.active) {
+                    if (videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0) {
+                        var vo = videoLoader.item.children[0];
+                        if (vo && vo.mediaPlayer) {
+                            vo.mediaPlayer.stop();
+                            vo.mediaPlayer.source = "";
+                        }
+                    }
+                    videoLoader.active = false;
+                }
+                videoReloadTimer.restart();
             } else if (currentIsInfo()) {
                 gameImage.visible = false;
                 infoLoader.active = true;
@@ -168,6 +195,18 @@ Item {
                 gameListView.currentMediaType = 0;
             }
             isVideoType = currentIsVideo();
+        }
+    }
+
+    Timer {
+        id: videoReloadTimer
+        interval: 80
+        repeat: false
+        onTriggered: {
+            if (currentSource && currentSource !== "" && currentIsVideo()) {
+                isVideoType = true;
+                videoLoader.active = true;
+            }
         }
     }
 
@@ -213,6 +252,7 @@ Item {
         active: false
 
         property var videoComponent: Component {
+
             Item {
                 anchors.fill: parent
 
@@ -268,6 +308,70 @@ Item {
                         if (player.playbackState === MediaPlayer.PlayingState) player.stop();
                         player.source = "";
                     }
+                }
+
+                Rectangle {
+                    id: videoProgressBar
+                    x: videoOutput.contentRect.x
+                    y: videoOutput.contentRect.y + videoOutput.contentRect.height - height
+                    width: videoOutput.contentRect.width
+                    height: 3
+                    color: "#40FFFFFF"
+                    z: 10
+                    visible: player.duration > 0
+
+                    Rectangle {
+                        id: videoProgressFill
+                        anchors {
+                            left: parent.left
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        width: player.duration > 0
+                        ? parent.width * (player.position / player.duration)
+                        : 0
+                        color: "white"
+                        opacity: 0.9
+                    }
+
+                    Timer {
+                        id: progressTimer
+                        interval: 32
+                        running: player.playbackState === MediaPlayer.PlayingState
+                        repeat: true
+                        property real lastPosition: 0
+                        property real lastTimestamp: 0
+
+                        onTriggered: {
+                            var now = Date.now();
+                            var elapsed = (now - lastTimestamp);
+                            if (player.playbackState === MediaPlayer.PlayingState && player.duration > 0) {
+                                var interpolated = Math.min(player.position + elapsed, player.duration);
+                                videoProgressFill.width = videoProgressBar.width * (interpolated / player.duration);
+                            }
+                            lastTimestamp = now;
+                        }
+
+                        onRunningChanged: {
+                            if (running) lastTimestamp = Date.now();
+                        }
+                    }
+                }
+
+                DropShadow {
+                    x: videoOutput.contentRect.x
+                    y: videoOutput.contentRect.y
+                    width: videoOutput.contentRect.width
+                    height: videoOutput.contentRect.height
+                    source: videoOutput
+                    color: "#80000000"
+                    radius: 20
+                    samples: 25
+                    spread: 0.1
+                    horizontalOffset: 5
+                    verticalOffset: 5
+                    transparentBorder: true
+                    visible: videoOutput.visible
                 }
 
                 Item {
@@ -434,32 +538,6 @@ Item {
                     if (vo && vo.mediaPlayer) vo.mediaPlayer.stop();
                 }
                 sourceComponent = undefined;
-            }
-        }
-
-        Connections {
-            target: gameListView
-            function onUpdateMediaType(mediaType) {
-                currentMediaType = mediaType;
-                isVideoType = gameMediaContainer.currentIsVideo();
-                videoLoader.active = (isVideoType && currentSource !== "");
-            }
-        }
-
-        Connections {
-            target: gameMediaContainer
-            function onCurrentSourceChanged() {
-                var it = gameMediaContainer.currentItem();
-                if (it && it.isVideo) {
-                    if (item && item.children && item.children.length > 0) {
-                        var vo = item.children[0];
-                        if (vo && vo.mediaPlayer) {
-                            vo.mediaPlayer.source = currentSource;
-                            vo.mediaPlayer.volume = isMuted ? 0 : savedVolume;
-                            vo.mediaPlayer.play();
-                        }
-                    }
-                }
             }
         }
     }
