@@ -417,14 +417,14 @@ FocusScope {
                 anchors {
                     right: parent.right
                     rightMargin: root.width * 0.1
-                    verticalCenter: parent.verticalCenter
                 }
 
-                y: gamesVisible ? 0 : parent.height
+                y: buttons.height
 
                 SequentialAnimation on y {
                     NumberAnimation {
-                        to: 0
+                        from: buttons.height
+                        to: (buttons.height - mainRow.height) / 2
                         duration: 300
                         easing.type: Easing.OutCubic
                     }
@@ -433,7 +433,8 @@ FocusScope {
 
                 SequentialAnimation on y {
                     NumberAnimation {
-                        to: parent.height
+                        from: (buttons.height - mainRow.height) / 2
+                        to: buttons.height
                         duration: 300
                         easing.type: Easing.InCubic
                     }
@@ -664,14 +665,14 @@ FocusScope {
             return;
         }
 
-        if (api.keys.isPageUp(event)) {
+        /*if (api.keys.isPageUp(event)) {
             event.accepted = true;
             musicPlayer.nextTrack();
         }
         else if (api.keys.isPageDown(event)) {
             event.accepted = true;
             musicPlayer.previousTrack();
-        }
+        }*/
 
         else if (gamesVisible && gameImage.visible) {
             if (api.keys.isNextPage(event)) {
@@ -695,16 +696,51 @@ FocusScope {
         volumeFeedbackTimer.restart();
     }
 
-    Text {
-        id: volumeFeedback
+    Item {
+        id: volumeFeedbackContainer
         anchors.centerIn: parent
-        color: "white"
-        font.pixelSize: root.width * 0.03
-        font.bold: true
-        opacity: 0
+        width: volumeFeedback.width + root.width * 0.06
+        height: volumeFeedback.height + root.height * 0.025
         z: 10000
+        opacity: volumeFeedback.opacity
+
         Behavior on opacity {
             NumberAnimation { duration: 200 }
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            radius: 14
+            color: root.backgroundColor
+            opacity: 0.75
+
+            layer.enabled: true
+            layer.effect: FastBlur {
+                radius: 48
+                transparentBorder: true
+            }
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            radius: 14
+            color: "transparent"
+            border.color: getColorForSystem(currentShortName)
+            border.width: 0
+            opacity: 0.9
+        }
+
+        Text {
+            id: volumeFeedback
+            anchors.centerIn: parent
+            color: "white"
+            font.pixelSize: root.width * 0.03
+            font.bold: true
+            opacity: 0
+
+            Behavior on opacity {
+                NumberAnimation { duration: 200 }
+            }
         }
     }
 
