@@ -4,11 +4,11 @@
 
 > 📢 New update: improved touchscreen compatibility on Android.
 
-![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/0a2ed611e894a0f866a90a69e63bd5b6ac519aeb/.meta/screenshots/screen0.png)
+![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/4228a0abacf9432cb65a704afd8fda66e225d07a/.meta/screenshots/screen0.png)
 
-![screen1](https://github.com/ZagonAb/Anbernic-Theme/blob/0a2ed611e894a0f866a90a69e63bd5b6ac519aeb/.meta/screenshots/screen1.png)
+![screen1](https://github.com/ZagonAb/Anbernic-Theme/blob/4228a0abacf9432cb65a704afd8fda66e225d07a/.meta/screenshots/screen1.png)
 
-![screen2](https://github.com/ZagonAb/Anbernic-Theme/blob/0a2ed611e894a0f866a90a69e63bd5b6ac519aeb/.meta/screenshots/screen2.png)
+![screen2](https://github.com/ZagonAb/Anbernic-Theme/blob/4228a0abacf9432cb65a704afd8fda66e225d07a/.meta/screenshots/screen2.png)
 
 # Short name icons
 - The PathView [images](https://github.com/ZagonAb/Systems-Arts-consoles) have been recreated trying to maintain the greatest possible fidelity to the original style.
