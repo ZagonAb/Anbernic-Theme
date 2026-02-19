@@ -1,4 +1,4 @@
-# Anbernic theme
+# RGLegacy 
 
 - A theme for Pegasus Frontend, inspired by Anbernic's RGLauncher interface.
 
