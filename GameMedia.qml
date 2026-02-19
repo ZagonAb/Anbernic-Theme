@@ -120,37 +120,19 @@ Item {
         target: gameListView
 
         function onUpdateImageSource(newSource) {
-            if (currentSource === newSource && !isVideoType) return;
+            if (currentSource === newSource) return;
 
-            if (videoLoader.active) {
-                if (videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0) {
-                    var vo = videoLoader.item.children[0];
-                    if (vo && vo.mediaPlayer) {
-                        vo.mediaPlayer.stop();
-                        vo.mediaPlayer.source = "";
-                    }
-                }
-                videoLoader.active = false;
-                isVideoType = false;
-            }
+            if (isVideoType) resetMedia();
 
             currentSource = newSource;
 
-            if (!newSource || newSource === "") {
-                gameImage.source = "";
-                return;
-            }
-
             var isVid = currentIsVideo() || newSource.endsWith(".mp4") || newSource.endsWith(".avi");
-
             if (isVid) {
                 gameImage.source = "";
-                gameImage.visible = false;
-                videoReloadTimer.restart();
+                videoLoader.active = true;
             } else {
-                gameImage.visible = true;
-                gameImage.source = "";
-                Qt.callLater(() => { gameImage.source = currentSource; });
+                videoLoader.active = false;
+                gameImage.source = currentSource;
             }
         }
 
@@ -162,17 +144,8 @@ Item {
                 gameImage.source = "";
                 gameImage.visible = false;
                 infoLoader.active = false;
-                if (videoLoader.active) {
-                    if (videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0) {
-                        var vo = videoLoader.item.children[0];
-                        if (vo && vo.mediaPlayer) {
-                            vo.mediaPlayer.stop();
-                            vo.mediaPlayer.source = "";
-                        }
-                    }
-                    videoLoader.active = false;
-                }
-                videoReloadTimer.restart();
+                if (videoLoader.active) videoLoader.active = false;
+                Qt.callLater(() => { videoLoader.active = true; });
             } else if (currentIsInfo()) {
                 gameImage.visible = false;
                 infoLoader.active = true;
@@ -195,18 +168,6 @@ Item {
                 gameListView.currentMediaType = 0;
             }
             isVideoType = currentIsVideo();
-        }
-    }
-
-    Timer {
-        id: videoReloadTimer
-        interval: 80
-        repeat: false
-        onTriggered: {
-            if (currentSource && currentSource !== "" && currentIsVideo()) {
-                isVideoType = true;
-                videoLoader.active = true;
-            }
         }
     }
 
@@ -358,20 +319,29 @@ Item {
                     }
                 }
 
-                DropShadow {
+                Rectangle {
+                    id: videoShadowProxy
                     x: videoOutput.contentRect.x
                     y: videoOutput.contentRect.y
                     width: videoOutput.contentRect.width
                     height: videoOutput.contentRect.height
-                    source: videoOutput
-                    color: "#80000000"
-                    radius: 20
+                    color: "black"
+                    visible: videoOutput.visible
+                    z: -1
+                }
+
+                DropShadow {
+                    anchors.fill: videoShadowProxy
+                    source: videoShadowProxy
+                    color: "#CC000000"
+                    radius: 24
                     samples: 25
-                    spread: 0.1
-                    horizontalOffset: 5
-                    verticalOffset: 5
+                    spread: 0.0
+                    horizontalOffset: 6
+                    verticalOffset: 6
                     transparentBorder: true
                     visible: videoOutput.visible
+                    z: -1
                 }
 
                 Item {
@@ -538,6 +508,32 @@ Item {
                     if (vo && vo.mediaPlayer) vo.mediaPlayer.stop();
                 }
                 sourceComponent = undefined;
+            }
+        }
+
+        Connections {
+            target: gameListView
+            function onUpdateMediaType(mediaType) {
+                currentMediaType = mediaType;
+                isVideoType = gameMediaContainer.currentIsVideo();
+                videoLoader.active = (isVideoType && currentSource !== "");
+            }
+        }
+
+        Connections {
+            target: gameMediaContainer
+            function onCurrentSourceChanged() {
+                var it = gameMediaContainer.currentItem();
+                if (it && it.isVideo) {
+                    if (item && item.children && item.children.length > 0) {
+                        var vo = item.children[0];
+                        if (vo && vo.mediaPlayer) {
+                            vo.mediaPlayer.source = currentSource;
+                            vo.mediaPlayer.volume = isMuted ? 0 : savedVolume;
+                            vo.mediaPlayer.play();
+                        }
+                    }
+                }
             }
         }
     }
