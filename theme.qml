@@ -245,6 +245,16 @@ FocusScope {
                         font.pixelSize: root.width * 0.02
                         font.bold: true
                         text: "Favorites"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                naviSound.play();
+                                root.filterState = 1;
+                                gameListView.currentIndex = 0;
+                                gameListView.updateGameImage();
+                            }
+                        }
                     }
 
                     Text {
@@ -254,6 +264,16 @@ FocusScope {
                         font.pixelSize: root.width * 0.02
                         font.bold: true
                         text: "All"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                naviSound.play();
+                                root.filterState = 0;
+                                gameListView.currentIndex = 0;
+                                gameListView.updateGameImage();
+                            }
+                        }
                     }
 
                     Text {
@@ -263,6 +283,16 @@ FocusScope {
                         font.pixelSize: root.width * 0.02
                         font.bold: true
                         text: "Recently Played"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                naviSound.play();
+                                root.filterState = 2;
+                                gameListView.currentIndex = 0;
+                                gameListView.updateGameImage();
+                            }
+                        }
                     }
                 }
 
@@ -352,7 +382,7 @@ FocusScope {
                     }
                     return "Game " + (gameListView.currentIndex + 1) + "/" + gameListView.model.count
                 }
-                font.pixelSize: root.width * 0.015
+                font.pixelSize: root.width * 0.022
                 color: "white"
                 font.bold: true
                 y: gamesVisible ? parent.height - height : parent.height
@@ -382,14 +412,14 @@ FocusScope {
 
             Row {
                 id: mainRow
-                spacing: root.width * 0.005
-
+                spacing: root.width * 0.02
 
                 anchors {
                     right: parent.right
-                    rightMargin: root.width * 0.28
+                    rightMargin: root.width * 0.1
                     verticalCenter: parent.verticalCenter
                 }
+
                 y: gamesVisible ? 0 : parent.height
 
                 SequentialAnimation on y {
@@ -410,174 +440,220 @@ FocusScope {
                     running: !gamesVisible
                 }
 
-                Row {
-                    id: row1
-                    spacing: root.width * 0.001
-                    Image {
-                        source: "assets/icons/x.png"
-                        width: root.width * 0.022
-                        height: root.width * 0.022
-                        mipmap: true
+                Item {
+                    width: row1.width
+                    height: row1.height
+                    scale: btnArea1.pressed ? 0.88 : 1.0
+                    Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
+
+                    Row {
+                        id: row1
+                        spacing: root.width * 0.001
+                        Image {
+                            id: row1Icon
+                            source: "assets/icons/x.png"
+                            width: root.width * 0.032
+                            height: root.width * 0.032
+                            mipmap: true
+                            layer.enabled: true
+                            layer.effect: DropShadow {
+                                horizontalOffset: 2
+                                verticalOffset: 2
+                                radius: 6
+                                samples: 13
+                                color: "#CC000000"
+                            }
+                        }
+                        Text {
+                            text: "Favorite"
+                            color: "white"
+                            font.pixelSize: root.width * 0.021
+                            font.bold: true
+                            anchors.verticalCenter: parent.verticalCenter
+                            layer.enabled: true
+                            layer.effect: DropShadow {
+                                horizontalOffset: 2
+                                verticalOffset: 2
+                                radius: 6
+                                samples: 13
+                                color: "#CC000000"
+                            }
+                        }
                     }
-                    Text {
-                        text: "Favorite"
-                        color: "white"
-                        font.pixelSize: root.width * 0.011
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Row {
-                    id: row2
-                    spacing: root.width * 0.001
-                    Image {
-                        source: "assets/icons/a.png"
-                        width: root.width * 0.022
-                        height: root.width * 0.022
-                        mipmap: true
-                    }
-                    Text {
-                        text: "OK"
-                        color: "white"
-                        font.pixelSize: root.width * 0.011
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Row {
-                    id: row3
-                    spacing: root.width * 0.001
-                    Image {
-                        source: "assets/icons/y.png"
-                        width: root.width * 0.022
-                        height: root.width * 0.022
-                        mipmap: true
-                    }
-                    Text {
-                        text: "Filter"
-                        color: "white"
-                        font.pixelSize: root.width * 0.011
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Row {
-                    id: row4
-                    spacing: root.width * 0.001
-                    Image {
-                        source: "assets/icons/b.png"
-                        width: root.width * 0.022
-                        height: root.width * 0.022
-                        mipmap: true
-                    }
-                    Text {
-                        text: "Back"
-                        color: "white"
-                        font.pixelSize: root.width * 0.011
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
-        }
-    }
-
-    MusicPlayer {
-        id: musicPlayer
-        width: parent.width * 0.25
-        height: parent.height * 0.08
-        anchors {
-            right: parent.right
-            rightMargin: parent.width * 0.02
-            bottom: parent.bottom
-            bottomMargin: 5
-        }
-        z: 999
-    }
-
-    Item {
-        id: musicControls
-        width: parent.width * 0.25
-        height: parent.height * 0.06
-        anchors {
-            right: parent.right
-            rightMargin: parent.width * 0.02
-            bottom: musicPlayer.top
-        }
-        z: 999
-
-        Row {
-            anchors.centerIn: parent
-            spacing: 15
-
-            Row {
-                spacing: 8
-                anchors.verticalCenter: parent.verticalCenter
-
-                Rectangle {
-                    width: 40
-                    height: 25
-                    radius: 12
-                    color: "#333333"
-                    border.color: "#555555"
-                    border.width: 1
-
-                    Text {
-                        text: "LT"
-                        color: "white"
-                        font.pixelSize: 14
-                        font.bold: true
-                        anchors.centerIn: parent
-                    }
-
                     MouseArea {
+                        id: btnArea1
                         anchors.fill: parent
-                        onClicked: musicPlayer.previousTrack()
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            faviSound.play();
+                            gameListView.toggleFavorite();
+                        }
                     }
                 }
 
-                Text {
-                    text: "Previous Music"
-                    color: "white"
-                    font.pixelSize: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
+                Item {
+                    width: row2.width
+                    height: row2.height
+                    scale: btnArea2.pressed ? 0.88 : 1.0
+                    Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
 
-            Row {
-                spacing: 8
-                anchors.verticalCenter: parent.verticalCenter
-
-                Rectangle {
-                    width: 40
-                    height: 25
-                    radius: 12
-                    color: "#333333"
-                    border.color: "#555555"
-                    border.width: 1
-
-                    Text {
-                        text: "RT"
-                        color: "white"
-                        font.pixelSize: 14
-                        font.bold: true
-                        anchors.centerIn: parent
+                    Row {
+                        id: row2
+                        spacing: root.width * 0.001
+                        Image {
+                            source: "assets/icons/a.png"
+                            width: root.width * 0.032
+                            height: root.width * 0.032
+                            mipmap: true
+                            layer.enabled: true
+                            layer.effect: DropShadow {
+                                horizontalOffset: 2
+                                verticalOffset: 2
+                                radius: 6
+                                samples: 13
+                                color: "#CC000000"
+                            }
+                        }
+                        Text {
+                            text: "OK"
+                            color: "white"
+                            font.pixelSize: root.width * 0.021
+                            font.bold: true
+                            anchors.verticalCenter: parent.verticalCenter
+                            layer.enabled: true
+                            layer.effect: DropShadow {
+                                horizontalOffset: 2
+                                verticalOffset: 2
+                                radius: 6
+                                samples: 13
+                                color: "#CC000000"
+                            }
+                        }
                     }
-
                     MouseArea {
+                        id: btnArea2
                         anchors.fill: parent
-                        onClicked: musicPlayer.nextTrack()
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            naviSound.play();
+                            gameListView.handleGameLaunch();
+                        }
                     }
                 }
 
-                Text {
-                    text: "Next Music"
-                    color: "white"
-                    font.pixelSize: 14
-                    anchors.verticalCenter: parent.verticalCenter
+                Item {
+                    width: row3.width
+                    height: row3.height
+                    scale: btnArea3.pressed ? 0.88 : 1.0
+                    Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
+
+                    Row {
+                        id: row3
+                        spacing: root.width * 0.001
+                        Image {
+                            source: "assets/icons/y.png"
+                            width: root.width * 0.032
+                            height: root.width * 0.032
+                            mipmap: true
+                            layer.enabled: true
+                            layer.effect: DropShadow {
+                                horizontalOffset: 2
+                                verticalOffset: 2
+                                radius: 6
+                                samples: 13
+                                color: "#CC000000"
+                            }
+                        }
+                        Text {
+                            text: "Filter"
+                            color: "white"
+                            font.pixelSize: root.width * 0.021
+                            font.bold: true
+                            anchors.verticalCenter: parent.verticalCenter
+                            layer.enabled: true
+                            layer.effect: DropShadow {
+                                horizontalOffset: 2
+                                verticalOffset: 2
+                                radius: 6
+                                samples: 13
+                                color: "#CC000000"
+                            }
+                        }
+                    }
+                    MouseArea {
+                        id: btnArea3
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (gameImage && gameImage.isVideoPlaying) {
+                                if (gameImage.filterBlockedNotification) {
+                                    gameImage.filterBlockedNotification.show();
+                                }
+                                return;
+                            }
+                            naviSound.play();
+                            root.filterState = (root.filterState + 1) % 3;
+                            gameListView.currentIndex = 0;
+                            gameListView.updateGameImage();
+                        }
+                    }
+                }
+
+                Item {
+                    width: row4.width
+                    height: row4.height
+                    scale: btnArea4.pressed ? 0.88 : 1.0
+                    Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
+
+                    Row {
+                        id: row4
+                        spacing: root.width * 0.001
+                        Image {
+                            source: "assets/icons/b.png"
+                            width: root.width * 0.032
+                            height: root.width * 0.032
+                            mipmap: true
+                            layer.enabled: true
+                            layer.effect: DropShadow {
+                                horizontalOffset: 2
+                                verticalOffset: 2
+                                radius: 6
+                                samples: 13
+                                color: "#CC000000"
+                            }
+                        }
+                        Text {
+                            text: "Back"
+                            color: "white"
+                            font.pixelSize: root.width * 0.021
+                            font.bold: true
+                            anchors.verticalCenter: parent.verticalCenter
+                            layer.enabled: true
+                            layer.effect: DropShadow {
+                                horizontalOffset: 2
+                                verticalOffset: 2
+                                radius: 6
+                                samples: 13
+                                color: "#CC000000"
+                            }
+                        }
+                    }
+                    MouseArea {
+                        id: btnArea4
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            naviSound.play();
+                            if (gameImage && gameImage.isVideoType) {
+                                gameImage.resetMedia();
+                            }
+                            collectionsVisible = true;
+                            collectionsFocused = true;
+                            gamesVisible = false;
+                            gamesFocused = false;
+                            systemView.forceActiveFocus();
+                        }
+                    }
                 }
             }
         }
@@ -596,6 +672,46 @@ FocusScope {
             event.accepted = true;
             musicPlayer.previousTrack();
         }
+
+        else if (gamesVisible && gameImage.visible) {
+            if (api.keys.isNextPage(event)) {
+                event.accepted = true;
+                var newVolume = Math.min(1.0, gameImage.savedVolume + 0.05);
+                gameImage.setVideoVolume(newVolume);
+                showVolumeFeedback(true);
+            }
+            else if (api.keys.isPrevPage(event)) {
+                event.accepted = true;
+                var newVolume = Math.max(0.01, gameImage.savedVolume - 0.05);
+                gameImage.setVideoVolume(newVolume);
+                showVolumeFeedback(false);
+            }
+        }
+    }
+
+    function showVolumeFeedback(isUp) {
+        volumeFeedback.text = Math.round(gameImage.savedVolume * 100) + "%";
+        volumeFeedback.opacity = 1;
+        volumeFeedbackTimer.restart();
+    }
+
+    Text {
+        id: volumeFeedback
+        anchors.centerIn: parent
+        color: "white"
+        font.pixelSize: root.width * 0.03
+        font.bold: true
+        opacity: 0
+        z: 10000
+        Behavior on opacity {
+            NumberAnimation { duration: 200 }
+        }
+    }
+
+    Timer {
+        id: volumeFeedbackTimer
+        interval: 1000
+        onTriggered: volumeFeedback.opacity = 0
     }
 
     Connections {
