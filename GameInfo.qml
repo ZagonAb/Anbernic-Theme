@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtGraphicalEffects 1.12
 import QtQuick.Layouts 1.15
+import "utils.js" as Utils
 import "qrc:/qmlutils" as PegasusUtils
 
 Item {
@@ -42,24 +43,22 @@ Item {
         Column {
             width: parent.width
             anchors.centerIn: parent
-            spacing: contentBounds.height * 0.02
+            spacing: contentBounds.height * 0.005
 
             Text {
                 width: parent.width
-                text: game ? game.title : ""
+                text: game ? Utils.cleanGameTitle(game.title) : "";
                 color: textColor
                 font {
-                    pixelSize: contentBounds.height * 0.05
+                    pixelSize: contentBounds.height * 0.06
                     bold: true
                     family: global.fonts.condensed
-                    letterSpacing: 1.5
                     capitalization: Font.AllUppercase
                 }
                 elide: Text.ElideRight
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 2
                 wrapMode: Text.Wrap
-                lineHeight: 0.9
 
                 layer.enabled: true
                 layer.effect: DropShadow {
@@ -71,7 +70,7 @@ Item {
 
             Item {
                 width: parent.width
-                height: contentBounds.height * 0.4
+                height: contentBounds.height * 0.55
 
                 Grid {
                     id: metadataGrid
@@ -79,7 +78,7 @@ Item {
                     width: parent.width * 0.9
                     columns: 2
                     columnSpacing: contentBounds.width * 0.03
-                    rowSpacing: contentBounds.height * 0.015
+                    rowSpacing: contentBounds.height * 0.02
 
                     component MetadataContainer: Rectangle {
                         property alias labelText: metaLabel.text
@@ -89,48 +88,68 @@ Item {
                         property alias customContent: customContentLoader.sourceComponent
 
                         width: (metadataGrid.width - metadataGrid.columnSpacing) / 2
-                        height: contentBounds.height * 0.09
+                        height: contentBounds.height * 0.14
                         color: "#20FFFFFF"
-                        border.color: "#60FFFFFF"
+                        border.color: "#50FFFFFF"
                         border.width: 1
-                        radius: 6
+                        radius: 8
 
                         Column {
                             anchors.fill: parent
-                            anchors.margins: 4
-                            spacing: 1
+                            anchors.margins: 6
+                            spacing: 0
+                            clip: true
 
                             Text {
                                 id: metaLabel
                                 width: parent.width
+                                height: parent.height * 0.35
                                 font {
-                                    pixelSize: contentBounds.height * 0.03
+                                    pixelSize: Math.max(8, parent.height * 0.25)
                                     bold: true
                                     family: global.fonts.sans
+                                    letterSpacing: 1.5
                                 }
                                 color: secondaryColor
                                 horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                                 elide: Text.ElideRight
+                            }
+
+                            Rectangle {
+                                width: parent.width * 0.4
+                                height: 1
+                                color: "#40FFFFFF"
+                                anchors.horizontalCenter: parent.horizontalCenter
                             }
 
                             Text {
                                 id: metaValue
                                 width: parent.width
+                                height: parent.height * 0.65 - 1
                                 font {
-                                    pixelSize: contentBounds.height * 0.03
+                                    pixelSize: Math.max(10, parent.height * 0.5)
+                                    bold: true
                                     family: global.fonts.sans
                                 }
                                 color: textColor
                                 horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                                 elide: Text.ElideRight
                                 visible: text !== ""
-                            }
 
+                                layer.enabled: true
+                                layer.effect: DropShadow {
+                                    color: shadowColor
+                                    radius: 4
+                                    samples: 9
+                                }
+                            }
 
                             Loader {
                                 id: customContentLoader
                                 width: parent.width
-                                height: contentBounds.height * 0.045
+                                height: parent.height * 0.65 - 1
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
@@ -159,13 +178,20 @@ Item {
                             Item {
                                 height: contentBounds.height * 0.05
                                 width: parent.width
+
+                                readonly property real ratingValue: gameInfoRoot.game
+                                ? gameInfoRoot.game.rating * 5
+                                : 0.0
+
                                 Row {
                                     spacing: contentBounds.width * 0.01
                                     anchors.centerIn: parent
 
                                     Text {
                                         id: ratingFallbackText
-                                        text: game ? Math.round(game.rating * 100) + "%" : "0%"
+                                        text: gameInfoRoot.game
+                                        ? Math.round(gameInfoRoot.game.rating * 100) + "%"
+                                        : "0%"
                                         color: textColor
                                         font {
                                             pixelSize: contentBounds.height * 0.03
@@ -179,20 +205,22 @@ Item {
                                         id: starsRepeater
                                         model: 5
                                         Image {
-                                            width: contentBounds.height * 0.035
+                                            required property int index
+                                            width: contentBounds.height * 0.05
                                             height: width
-                                            source: {
-                                                if (!game) return "assets/icons/star0.png";
-                                                const ratingValue = game.rating * 5;
-                                                const starIndex = index + 1;
-
-                                                if (ratingValue >= starIndex) return "assets/icons/star1.png";
-                                                else if (ratingValue >= starIndex - 0.5) return "assets/icons/star2.png";
-                                                else return "assets/icons/star0.png";
-                                            }
                                             fillMode: Image.PreserveAspectFit
                                             mipmap: true
                                             anchors.verticalCenter: parent.verticalCenter
+
+                                            source: {
+                                                var starIndex = index + 1;
+                                                if (ratingValue >= starIndex)
+                                                    return "assets/icons/star1.png";
+                                                    else if (ratingValue >= starIndex - 0.5)
+                                                        return "assets/icons/star2.png";
+                                                        else
+                                                            return "assets/icons/star0.png";
+                                            }
 
                                             onStatusChanged: {
                                                 if (status === Image.Error) {
@@ -241,19 +269,13 @@ Item {
                         visible: game && game.playTime > 0
                     }
 
-                    MetadataContainer {
-                        labelText: "FAVORITE"
-                        valueText: "❤️"
-                        valueColor: highlightColor
-                        visible: game && game.favorite
-                    }
                 }
             }
 
             Rectangle {
                 id: descriptionContainer
                 width: parent.width
-                height: contentBounds.height * 0.45
+                height: contentBounds.height * 0.30
                 color: "transparent"
                 clip: true
 
@@ -301,11 +323,13 @@ Item {
                         text: game && game.description ? game.description : "No description available..."
                         color: textColor
                         font {
-                            pixelSize: contentBounds.height * 0.035
+                            pixelSize: contentBounds.height * 0.05
                             family: global.fonts.sans
+                            letterSpacing: 1.5
                         }
                         wrapMode: Text.WordWrap
-                        lineHeight: 1.4
+
+                        lineHeight: 1.0
                         textFormat: Text.RichText
                         onLinkActivated: Qt.openUrlExternally(link)
                         topPadding: contentBounds.height * 0.02

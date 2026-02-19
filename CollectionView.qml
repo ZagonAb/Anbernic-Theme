@@ -4,12 +4,14 @@ import QtGraphicalEffects 1.12
 PathView {
     id: systemView
     width: parent.width
-    height: parent.height * 0.35
+    height: parent.height * 0.45
+
     anchors {
         horizontalCenter: parent.horizontalCenter
         top: parent.top
-        topMargin: parent.height * 0.25
+        topMargin: parent.height * 0.15
     }
+
     model: api.collections
     pathItemCount: Math.min(5, model.count)
     preferredHighlightBegin: 0.5
@@ -18,8 +20,9 @@ PathView {
     highlightMoveDuration: 300
     opacity: collectionsVisible ? 1 : 0
     visible: collectionsVisible
-    property real itemSpacing: width * 0.2
-    property real delegateSize: Math.min(itemSpacing * 0.8, height * 0.8)
+
+    property real itemSpacing: width * 0.24
+    property real delegateSize: Math.min(itemSpacing * 0.9, height * 0.9)
 
     path: Path {
         startX: systemView.width/2 - ((systemView.pathItemCount - 1) * systemView.itemSpacing)/2
@@ -32,6 +35,7 @@ PathView {
 
     delegate: Item {
         id: delegateItem
+
         width: systemView.delegateSize
         height: systemView.delegateSize
         scale: PathView.isCurrentItem ? 1 : 0.85
@@ -47,7 +51,7 @@ PathView {
                 fill: parent
                 margins: -parent.width * 0.025
                 topMargin: -parent.width * 0.05
-                bottomMargin: -systemView.height * 0.6
+                bottomMargin: -systemView.height * 0.45
             }
             color: delegateItem.PathView.isCurrentItem ? "#33FFFFFF" : "transparent"
             border.color: "white"
@@ -59,6 +63,35 @@ PathView {
             }
             Behavior on color {
                 ColorAnimation { duration: 300 }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                property int clickCount: 0
+
+                onClicked: {
+                    clickCount++
+
+                    if (clickCount === 1) {
+                        systemView.currentIndex = index
+                    }
+                    else if (clickCount >= 2) {
+                        clickCount = 0
+
+                        systemView.currentIndex = index
+                        naviSound.play()
+
+                        if (gameImage && gameImage.videoLoader) {
+                            gameImage.videoLoader.active = true
+                        }
+
+                        collectionsVisible = false
+                        collectionsFocused = false
+                        gamesVisible = true
+                        gamesFocused = true
+                        gameListView.forceActiveFocus()
+                    }
+                }
             }
         }
 
@@ -112,6 +145,7 @@ PathView {
                 easing.type: Easing.OutCubic
             }
         }
+
         Behavior on opacity {
             NumberAnimation {
                 duration: 300
@@ -125,6 +159,7 @@ PathView {
     }
 
     focus: collectionsFocused
+
     Keys.onLeftPressed: decrementCurrentIndex(naviSound.play())
     Keys.onRightPressed: incrementCurrentIndex(naviSound.play())
 

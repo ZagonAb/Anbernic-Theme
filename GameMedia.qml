@@ -1,9 +1,11 @@
 import QtQuick 2.15
 import QtMultimedia 5.15
 import SortFilterProxyModel 0.2
+import QtGraphicalEffects 1.12
 
 Item {
     id: gameMediaContainer
+
     anchors {
         left: parent.left
         leftMargin: parent.width * 0.4 + 40
@@ -11,39 +13,30 @@ Item {
         rightMargin: 20
         verticalCenter: parent.verticalCenter
     }
-    height: parent.height * 0.70
+
+    height: parent.height * 0.75
 
     property string currentSource: ""
     property int currentMediaType: 0
     property bool isVideoType: false
-    property var availableMediaTypes: []
-    property var mediaTypeNames: {
-        "boxFront": qsTr("Box Front"),
-        "boxBack": qsTr("Box Back"),
-        "boxSpine": qsTr("Box Spine"),
-        "boxFull": qsTr("Full Box"),
-        "cartridge": qsTr("Cartridge"),
-        "logo": qsTr("Logo"),
-        "marquee": qsTr("Marquee"),
-        "bezel": qsTr("Bezel"),
-        "panel": qsTr("Panel"),
-        "cabinetLeft": qsTr("Cabinet Left"),
-        "cabinetRight": qsTr("Cabinet Right"),
-        "tile": qsTr("Tile"),
-        "banner": qsTr("Banner"),
-        "steam": qsTr("Steam Grid"),
-        "poster": qsTr("Poster"),
-        "background": qsTr("Background"),
-        "screenshot": qsTr("Screenshot"),
-        "titlescreen": qsTr("Title Screen"),
-        "video": qsTr("Video"),
-        "info": qsTr("Game Info")
+    property var availableMedia: []
+
+    function currentItem() {
+        return (availableMedia.length > 0 && currentMediaType < availableMedia.length)
+        ? availableMedia[currentMediaType] : null;
+    }
+    function currentIsVideo() {
+        var it = currentItem();
+        return it ? it.isVideo : false;
+    }
+    function currentIsInfo() {
+        var it = currentItem();
+        return it ? (it.type === "info") : false;
     }
 
     property real savedVolume: api.memory.has("volume") ? api.memory.get("volume") : 0.03
     property real displayVolume: Math.pow(savedVolume, 0.3)
     property bool isMuted: api.memory.has("muted") ? api.memory.get("muted") : false
-
     property alias filterBlockedNotification: filterBlockedNotification
     property bool isVideoPlaying: videoLoader.active && videoLoader.item && videoLoader.item.children &&
     videoLoader.item.children.length > 0 &&
@@ -52,22 +45,21 @@ Item {
 
     signal videoPlayingChanged(bool isPlaying)
 
-    function displayToVolume(displayPos) {
-        return Math.pow(displayPos, 3.33)
-    }
+    function displayToVolume(displayPos) { return Math.pow(displayPos, 3.33) }
 
     function setVideoVolume(newVolume) {
-        savedVolume = Math.max(0.01, Math.min(1.0, newVolume))
-        displayVolume = Math.pow(savedVolume, 0.3)
-        api.memory.set("volume", savedVolume)
-
+        savedVolume = Math.max(0.01, Math.min(1.0, newVolume));
+        displayVolume = Math.pow(savedVolume, 0.3);
+        api.memory.set("volume", savedVolume);
         if (videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0) {
-            var videoOutput = videoLoader.item.children[0]
+            var videoOutput = videoLoader.item.children[0];
             if (videoOutput && videoOutput.mediaPlayer && !isMuted) {
-                videoOutput.mediaPlayer.volume = savedVolume
+                videoOutput.mediaPlayer.volume = savedVolume;
             }
         }
     }
+
+    function getVolume() { return savedVolume; }
 
     Rectangle {
         id: filterBlockedNotification
@@ -86,7 +78,7 @@ Item {
             parent.width * 0.8
         )
         height: messageText.implicitHeight + verticalMargin * 2
-        z:1
+        z: 1
 
         Text {
             id: messageText
@@ -100,14 +92,9 @@ Item {
             horizontalAlignment: Text.AlignHCenter
         }
 
-        Behavior on opacity {
-            NumberAnimation { duration: 300 }
-        }
+        Behavior on opacity { NumberAnimation { duration: 300 } }
 
-        function show() {
-            opacity = 1;
-            hideTimer.restart();
-        }
+        function show() { opacity = 1; hideTimer.restart(); }
 
         Timer {
             id: hideTimer
@@ -117,35 +104,30 @@ Item {
     }
 
     Connections {
-        target: videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0 ?
-        videoLoader.item.children[0].mediaPlayer : null
-        function onPlaybackStateChanged() {
-            videoPlayingChanged(isVideoPlaying);
-        }
+        target: videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0
+        ? videoLoader.item.children[0].mediaPlayer : null
+        function onPlaybackStateChanged() { videoPlayingChanged(isVideoPlaying); }
     }
-
 
     Loader {
         id: infoLoader
         anchors.fill: parent
         active: false
-        sourceComponent: GameInfo {
-            game: gameListView.game
-        }
+        sourceComponent: GameInfo { game: gameListView.game }
     }
 
     Connections {
         target: gameListView
+
         function onUpdateImageSource(newSource) {
             if (currentSource === newSource) return;
 
-            if (isVideoType) {
-                resetMedia();
-            }
+            if (isVideoType) resetMedia();
 
             currentSource = newSource;
 
-            if (availableMediaTypes[currentMediaType] === "video" || newSource.endsWith(".mp4") || newSource.endsWith(".avi")) {
+            var isVid = currentIsVideo() || newSource.endsWith(".mp4") || newSource.endsWith(".avi");
+            if (isVid) {
                 gameImage.source = "";
                 videoLoader.active = true;
             } else {
@@ -156,7 +138,7 @@ Item {
 
         function onUpdateMediaType(mediaType) {
             currentMediaType = mediaType;
-            isVideoType = (availableMediaTypes[currentMediaType] === "video");
+            isVideoType = currentIsVideo();
 
             if (isVideoType) {
                 gameImage.source = "";
@@ -164,13 +146,11 @@ Item {
                 infoLoader.active = false;
                 if (videoLoader.active) videoLoader.active = false;
                 Qt.callLater(() => { videoLoader.active = true; });
-            }
-            else if (availableMediaTypes[currentMediaType] === "info") {
+            } else if (currentIsInfo()) {
                 gameImage.visible = false;
                 infoLoader.active = true;
                 if (videoLoader.active) videoLoader.active = false;
-            }
-            else {
+            } else {
                 infoLoader.active = false;
                 if (videoLoader.active) videoLoader.active = false;
                 gameImage.visible = true;
@@ -181,13 +161,13 @@ Item {
             }
         }
 
-        function onUpdateAvailableMediaTypes(types) {
-            availableMediaTypes = types;
-            if (currentMediaType >= availableMediaTypes.length) {
+        function onUpdateAvailableMedia(media) {
+            availableMedia = media;
+            if (currentMediaType >= availableMedia.length) {
                 currentMediaType = 0;
                 gameListView.currentMediaType = 0;
             }
-            isVideoType = (availableMediaTypes[currentMediaType] === "video");
+            isVideoType = currentIsVideo();
         }
     }
 
@@ -196,9 +176,7 @@ Item {
         function onCurrentIndexChanged() {
             resetToDefault();
             Qt.callLater(function() {
-                if (gameListView.game) {
-                    gameListView.updateGameImage();
-                }
+                if (gameListView.game) gameListView.updateGameImage();
             });
         }
     }
@@ -213,10 +191,27 @@ Item {
         visible: !isVideoType && source !== ""
     }
 
+    DropShadow {
+        id: imageDropShadow
+        anchors.fill: gameImage
+        source: gameImage
+        visible: gameImage.visible && gameImage.status === Image.Ready
+        color: "#80000000"
+        radius: 20
+        samples: 25
+        spread: 0.1
+        horizontalOffset: 5
+        verticalOffset: 5
+        transparentBorder: true
+
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+    }
+
     Loader {
         id: videoLoader
         anchors.fill: parent
         active: false
+
         property var videoComponent: Component {
             Item {
                 anchors.fill: parent
@@ -247,9 +242,9 @@ Item {
                                         }
                                     }
                                 });
-                            }
-                            else if (status === MediaPlayer.Loaded) {
-                                if (videoLoader.active && availableMediaTypes[gameListView.currentMediaType] === "video") {
+                            } else if (status === MediaPlayer.Loaded) {
+                                var it = gameMediaContainer.currentItem();
+                                if (videoLoader.active && it && it.isVideo) {
                                     play();
                                 }
                             }
@@ -257,7 +252,7 @@ Item {
 
                         onErrorChanged: {
                             if (error !== MediaPlayer.NoError) {
-                                console.log("Error en video:", errorString);
+                                console.log("Video error:", errorString);
                                 videoLoader.active = false;
                             }
                         }
@@ -270,9 +265,7 @@ Item {
                     }
 
                     Component.onDestruction: {
-                        if (player.playbackState === MediaPlayer.PlayingState) {
-                            player.stop();
-                        }
+                        if (player.playbackState === MediaPlayer.PlayingState) player.stop();
                         player.source = "";
                     }
                 }
@@ -281,25 +274,23 @@ Item {
                     id: volumeControls
                     anchors {
                         right: parent.right
-                        rightMargin: parent.width * 0.05
+                        rightMargin: parent.width * 0.01
                         verticalCenter: parent.verticalCenter
                     }
-                    width: parent.width * 0.04
+                    width: parent.width * 0.06
                     height: parent.height * 0.6
                     visible: videoOutput.visible
+                    z: 9999
 
                     Rectangle {
                         id: volumeBackground
                         anchors.fill: parent
                         radius: 8
-                        color: "#60000000"
-                        border.color: "#60FFFFFF"
+                        color: "#80000000"
+                        border.color: "#80FFFFFF"
                         border.width: 1
-                        opacity: volumeMouseArea.containsMouse || muteButton.hovered ? 1.0 : 0.3
-
-                        Behavior on opacity {
-                            NumberAnimation { duration: 200 }
-                        }
+                        opacity: volumeMouseArea.containsMouse || muteButton.hovered || volumeHandleArea.pressed ? 1.0 : 0.5
+                        Behavior on opacity { NumberAnimation { duration: 200 } }
                     }
 
                     Item {
@@ -309,31 +300,34 @@ Item {
                             topMargin: 8
                             horizontalCenter: parent.horizontalCenter
                         }
-                        width: parent.width * 0.6
+                        width: parent.width * 0.7
                         height: width
-
                         property bool hovered: muteMouseArea.containsMouse
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: width / 2
+                            color: muteMouseArea.pressed ? "#40FFFFFF" : "transparent"
+                        }
 
                         Image {
                             anchors.fill: parent
                             source: isMuted ? "assets/icons/mute.png" : "assets/icons/volume.png"
                             fillMode: Image.PreserveAspectFit
-                            opacity: parent.hovered ? 1.0 : 0.8
-
-                            Behavior on opacity {
-                                NumberAnimation { duration: 150 }
-                            }
+                            opacity: parent.hovered ? 1.0 : 0.9
                             mipmap: true
                         }
 
                         MouseArea {
                             id: muteMouseArea
                             anchors.fill: parent
+                            anchors.margins: -5
                             hoverEnabled: true
                             onClicked: {
                                 isMuted = !isMuted;
                                 api.memory.set("muted", isMuted);
-                                player.volume = isMuted ? 0 : savedVolume;
+                                if (player) player.volume = isMuted ? 0 : savedVolume;
+                                mouse.accepted = true;
                             }
                         }
                     }
@@ -342,12 +336,12 @@ Item {
                         id: volumeSlider
                         anchors {
                             top: muteButton.bottom
-                            topMargin: 10
+                            topMargin: 15
                             bottom: parent.bottom
-                            bottomMargin: 8
+                            bottomMargin: 15
                             horizontalCenter: parent.horizontalCenter
                         }
-                        width: parent.width * 0.5
+                        width: parent.width * 0.4
 
                         Rectangle {
                             id: volumeTrack
@@ -358,62 +352,65 @@ Item {
 
                         Rectangle {
                             id: volumeLevel
-                            anchors {
-                                bottom: parent.bottom
-                                horizontalCenter: parent.horizontalCenter
-                            }
+                            anchors { bottom: parent.bottom; horizontalCenter: parent.horizontalCenter }
                             width: parent.width
-                            height: parent.height * (isMuted ? 0 : displayVolume)
+                            height: parent.height * (isMuted ? 0 : savedVolume)
                             radius: width / 2
                             color: isMuted ? "#FF6B6B" : "#FFFFFF"
-
-                            Behavior on height {
-                                NumberAnimation { duration: 100 }
-                            }
-                            Behavior on color {
-                                ColorAnimation { duration: 150 }
-                            }
+                            Behavior on height { NumberAnimation { duration: 100 } }
                         }
 
                         Rectangle {
                             id: volumeHandle
                             anchors.horizontalCenter: parent.horizontalCenter
-                            y: parent.height * (1 - (isMuted ? 0 : displayVolume)) - height / 2
-                            width: parent.width * 1.5
+                            y: parent.height * (1 - (isMuted ? 0 : savedVolume)) - height / 2
+                            width: parent.width * 2
                             height: width
                             radius: width / 2
                             color: volumeHandleArea.pressed ? "#FFFFFF" : "#E0E0E0"
                             border.color: "#80000000"
                             border.width: 1
-
-                            Behavior on y {
-                                NumberAnimation { duration: 100 }
-                            }
+                            Behavior on y { NumberAnimation { duration: 100 } }
                         }
 
                         MouseArea {
                             id: volumeHandleArea
                             anchors.fill: parent
-                            anchors.margins: -10
+                            anchors.margins: -15
                             hoverEnabled: true
 
+                            property bool draggingFromHandle: false
+                            property real dragOffsetY: 0
+
                             onPressed: {
-                                if (isMuted) {
-                                    isMuted = false;
-                                    api.memory.set("muted", false);
+                                if (isMuted) { isMuted = false; api.memory.set("muted", false); }
+                                var adjustedY = mouseY - 15;
+                                var handleCenterY = volumeHandle.y + volumeHandle.height / 2;
+                                if (Math.abs(adjustedY - handleCenterY) <= volumeHandle.height) {
+                                    draggingFromHandle = true;
+                                    dragOffsetY = adjustedY - handleCenterY;
+                                } else {
+                                    draggingFromHandle = false;
+                                    dragOffsetY = 0;
+                                    updateVolumeFromY(adjustedY);
                                 }
+                                mouse.accepted = true;
                             }
 
                             onPositionChanged: {
                                 if (pressed) {
-                                    var displayPosition = 1.0 - Math.max(0, Math.min(1, mouseY / volumeSlider.height));
-                                    var newVolume = displayToVolume(displayPosition);
-                                    setVideoVolume(newVolume);
-
-                                    if (!isMuted) {
-                                        player.volume = savedVolume;
-                                    }
+                                    var adjustedY = mouseY - 15;
+                                    updateVolumeFromY(draggingFromHandle ? adjustedY - dragOffsetY : adjustedY);
+                                    mouse.accepted = true;
                                 }
+                            }
+
+                            onReleased: { draggingFromHandle = false; dragOffsetY = 0; mouse.accepted = true; }
+
+                            function updateVolumeFromY(y) {
+                                var linearPos = 1.0 - Math.max(0, Math.min(1, y / volumeSlider.height));
+                                setVideoVolume(linearPos);
+                                if (!isMuted && player) player.volume = savedVolume;
                             }
                         }
                     }
@@ -433,10 +430,8 @@ Item {
                 sourceComponent = videoComponent;
             } else {
                 if (item && item.children && item.children.length > 0) {
-                    var videoOutput = item.children[0];
-                    if (videoOutput && videoOutput.mediaPlayer) {
-                        videoOutput.mediaPlayer.stop();
-                    }
+                    var vo = item.children[0];
+                    if (vo && vo.mediaPlayer) vo.mediaPlayer.stop();
                 }
                 sourceComponent = undefined;
             }
@@ -446,7 +441,7 @@ Item {
             target: gameListView
             function onUpdateMediaType(mediaType) {
                 currentMediaType = mediaType;
-                isVideoType = (availableMediaTypes[mediaType] === "video");
+                isVideoType = gameMediaContainer.currentIsVideo();
                 videoLoader.active = (isVideoType && currentSource !== "");
             }
         }
@@ -454,16 +449,106 @@ Item {
         Connections {
             target: gameMediaContainer
             function onCurrentSourceChanged() {
-                if (availableMediaTypes[gameListView.currentMediaType] === "video") {
+                var it = gameMediaContainer.currentItem();
+                if (it && it.isVideo) {
                     if (item && item.children && item.children.length > 0) {
-                        var videoOutput = item.children[0];
-                        if (videoOutput && videoOutput.mediaPlayer) {
-                            videoOutput.mediaPlayer.source = currentSource;
-                            videoOutput.mediaPlayer.volume = isMuted ? 0 : savedVolume;
-                            videoOutput.mediaPlayer.play();
+                        var vo = item.children[0];
+                        if (vo && vo.mediaPlayer) {
+                            vo.mediaPlayer.source = currentSource;
+                            vo.mediaPlayer.volume = isMuted ? 0 : savedVolume;
+                            vo.mediaPlayer.play();
                         }
                     }
                 }
+            }
+        }
+    }
+
+    Item {
+        id: swipeArea
+        anchors.fill: parent
+        visible: gameListView.game !== null && availableMedia.length > 1
+
+        property real startX: 0
+        property bool swipeDetected: false
+        property real threshold: width * 0.1
+
+        MouseArea {
+            anchors {
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
+                right: parent.right
+                rightMargin: isVideoType ? parent.width * 0.08 : 0
+            }
+            property real pressX: 0
+            propagateComposedEvents: true
+
+            onPressed: (mouse) => {
+                pressX = mouse.x;
+                swipeArea.startX = mouse.x;
+                swipeArea.swipeDetected = false;
+            }
+
+            onPositionChanged: (mouse) => {
+                if (swipeArea.swipeDetected) return;
+                var deltaX = mouse.x - pressX;
+                if (Math.abs(deltaX) > swipeArea.threshold) {
+                    swipeArea.swipeDetected = true;
+                    if (deltaX > 0) swipeLeft(); else swipeRight();
+                }
+            }
+
+            onReleased: {
+                if (!swipeArea.swipeDetected) {
+                    if (!gameListView.activeFocus) gameListView.forceActiveFocus();
+                }
+            }
+
+            function swipeRight() {
+                if (availableMedia.length > 0) {
+                    naviSound.play();
+                    if (isVideoType && videoLoader.item) gameMediaContainer.resetMedia();
+                    var newIndex = (gameListView.currentMediaType + 1) % availableMedia.length;
+                    gameListView.currentMediaType = newIndex;
+                    gameListView.updateGameImage();
+                }
+            }
+
+            function swipeLeft() {
+                if (availableMedia.length > 0) {
+                    naviSound.play();
+                    if (isVideoType && videoLoader.item) gameMediaContainer.resetMedia();
+                    var newIndex = (gameListView.currentMediaType - 1 + availableMedia.length) % availableMedia.length;
+                    gameListView.currentMediaType = newIndex;
+                    gameListView.updateGameImage();
+                }
+            }
+        }
+
+        Rectangle {
+            anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
+            width: parent.width * 0.1
+            color: "white"
+            opacity: swipeArea.containsMouse ? 0.1 : 0
+            visible: gameListView.game !== null && availableMedia.length > 1
+            Behavior on opacity { NumberAnimation { duration: 200 } }
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#00FFFFFF" }
+                GradientStop { position: 1.0; color: "#20FFFFFF" }
+            }
+        }
+
+        Rectangle {
+            anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
+            width: parent.width * 0.1
+            color: "white"
+            opacity: swipeArea.containsMouse ? 0.1 : 0
+            visible: gameListView.game !== null && availableMedia.length > 1
+            Behavior on opacity { NumberAnimation { duration: 200 } }
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#20FFFFFF" }
+                GradientStop { position: 1.0; color: "#00FFFFFF" }
             }
         }
     }
@@ -473,23 +558,21 @@ Item {
         anchors {
             bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
-            bottomMargin: parent.height * 0.01
+            bottomMargin: -parent.height * 0.06
         }
-        width: Math.min(parent.width * 0.5, (availableMediaTypes.length * parent.height * 0.05) + ((availableMediaTypes.length - 1) * 8))
+        width: Math.min(parent.width * 0.5,
+                        (availableMedia.length * parent.height * 0.05) + ((availableMedia.length - 1) * 8))
         height: parent.height * 0.05
         radius: height / 2
         color: "#80000000"
         border.color: "#60FFFFFF"
         border.width: 1
 
-        visible: gameListView.game !== null && availableMediaTypes.length > 0
+        visible: gameListView.game !== null && availableMedia.length > 0
+
         property string currentMediaName: {
-            if (availableMediaTypes.length === 1 && availableMediaTypes[0] === "info") {
-                return mediaTypeNames["info"];
-            }
-            return availableMediaTypes.length > 0 ?
-            (mediaTypeNames[availableMediaTypes[gameListView.currentMediaType]] ||
-            availableMediaTypes[gameListView.currentMediaType]) : "";
+            var it = gameMediaContainer.currentItem();
+            return it ? it.label : "";
         }
 
         Row {
@@ -498,18 +581,18 @@ Item {
             spacing: 8
 
             Repeater {
-                model: availableMediaTypes.length
+                model: availableMedia.length
                 Rectangle {
                     width: parent.parent.height * 0.35
                     height: width
                     radius: width / 2
                     color: gameListView.currentMediaType === index ? "white" : "#60FFFFFF"
-                    Behavior on color {
-                        ColorAnimation { duration: 150 }
-                    }
+                    Behavior on color { ColorAnimation { duration: 150 } }
                     MouseArea {
                         anchors.fill: parent
+                        anchors.margins: -10
                         onClicked: {
+                            naviSound.play();
                             gameListView.currentMediaType = index;
                             gameListView.updateGameImage();
                         }
@@ -521,11 +604,8 @@ Item {
 
     function cleanupMediaPlayer() {
         if (videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0) {
-            var videoOutput = videoLoader.item.children[0];
-            if (videoOutput && videoOutput.mediaPlayer) {
-                videoOutput.mediaPlayer.stop();
-                videoOutput.mediaPlayer.source = "";
-            }
+            var vo = videoLoader.item.children[0];
+            if (vo && vo.mediaPlayer) { vo.mediaPlayer.stop(); vo.mediaPlayer.source = ""; }
         }
         videoLoader.active = false;
         currentSource = "";
@@ -535,11 +615,8 @@ Item {
 
     function resetMedia() {
         if (isVideoType && videoLoader.item && videoLoader.item.children && videoLoader.item.children.length > 0) {
-            var videoOutput = videoLoader.item.children[0];
-            if (videoOutput && videoOutput.mediaPlayer) {
-                videoOutput.mediaPlayer.stop();
-                videoOutput.mediaPlayer.source = "";
-            }
+            var vo = videoLoader.item.children[0];
+            if (vo && vo.mediaPlayer) { vo.mediaPlayer.stop(); vo.mediaPlayer.source = ""; }
             videoLoader.active = false;
             isVideoType = false;
         }
@@ -551,29 +628,28 @@ Item {
         isVideoType = false;
         gameListView.currentMediaType = 0;
 
-        if (gameListView.game && gameListView.availableMediaTypes &&
-            (gameListView.availableMediaTypes.length === 0 ||
-            (gameListView.availableMediaTypes.length === 1 &&
-            gameListView.availableMediaTypes[0] === "info"))) {
+        var onlyInfo = (gameListView.availableMedia.length === 0 ||
+        (gameListView.availableMedia.length === 1 &&
+        gameListView.availableMedia[0].type === "info"));
+
+        if (gameListView.game && onlyInfo) {
             infoLoader.active = true;
-        gameImage.visible = false;
-        currentSource = "";
-        currentMediaType = gameListView.availableMediaTypes.indexOf("info");
-        gameListView.currentMediaType = currentMediaType;
-            } else {
-                infoLoader.active = false;
-                gameImage.visible = true;
-                if (gameListView.game && gameListView.game.assets) {
-                    currentSource = gameListView.getFirstAvailableMedia();
-                    gameImage.source = currentSource;
-                }
+            gameImage.visible = false;
+            currentSource = "";
+            currentMediaType = 0;
+            gameListView.currentMediaType = 0;
+        } else {
+            infoLoader.active = false;
+            gameImage.visible = true;
+            if (gameListView.game && gameListView.game.assets) {
+                currentSource = gameListView.getFirstAvailableMedia();
+                gameImage.source = currentSource;
             }
+        }
     }
 
     Connections {
         target: systemView
-        function onCurrentIndexChanged() {
-            resetToDefault();
-        }
+        function onCurrentIndexChanged() { resetToDefault(); }
     }
 }

@@ -8,6 +8,7 @@ QtObject {
         "cps2": "#006453",
         "cps3": "#005d02",
         "mastersystem": "#4d0d0c",
+        "android": "#4c5c19",
         "dreamcast": "#5c5c5c",
         "megadrive": "#20346d",
         "turbografxcd": "#6a3921",

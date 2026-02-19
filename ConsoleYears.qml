@@ -6,6 +6,7 @@ QtObject {
         "movies": "various",
         "dreamcast": "1998",
         "cps1": "1988",
+        "android": "2008",
         "cps2": "1993",
         "cps3": "1996",
         "satellaview": "1995",
