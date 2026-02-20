@@ -84,8 +84,28 @@ ListView {
 
     focus: gamesFocused
 
-    Keys.onUpPressed: decrementCurrentIndex(naviSound.play())
-    Keys.onDownPressed: incrementCurrentIndex(naviSound.play())
+    highlightFollowsCurrentItem: true
+    highlightMoveDuration: 0
+
+    Keys.onUpPressed: {
+        naviSound.play();
+        if (currentIndex <= 0) {
+            positionViewAtIndex(count - 1, ListView.Contain);
+            currentIndex = count - 1;
+        } else {
+            currentIndex--;
+        }
+    }
+
+    Keys.onDownPressed: {
+        naviSound.play();
+        if (currentIndex >= count - 1) {
+            positionViewAtIndex(0, ListView.Contain);
+            currentIndex = 0;
+        } else {
+            currentIndex++;
+        }
+    }
 
     Keys.onPressed: function(event) {
         if (event.isAutoRepeat) return;
