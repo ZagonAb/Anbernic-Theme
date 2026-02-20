@@ -49,8 +49,8 @@ PathView {
             id: selectionRect
             anchors {
                 fill: parent
-                margins: -parent.width * 0.025
-                topMargin: -parent.width * 0.05
+                margins: -parent.width * 0.0
+                topMargin: -parent.width * 0.02
                 bottomMargin: -systemView.height * 0.45
             }
             color: delegateItem.PathView.isCurrentItem ? "#33FFFFFF" : "transparent"
