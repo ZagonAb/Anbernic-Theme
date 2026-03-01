@@ -2,19 +2,9 @@
 
 - A theme for Pegasus Frontend, inspired by Anbernic's RGLauncher interface.
 
-## 📢 Community Feedback Needed!
 
-I'm currently deciding how the **LB / RB buttons** should behave in the theme.
+> 📢 No more updates.
 
-Should they control volume, or be used for letter-based filtering in the game list?
-
-👉 Join the discussion and vote ![here](https://github.com/ZagonAb/Anbernic-Theme/issues/1)
-
-
-
-> 📢 New update: improved touchscreen compatibility on Android.
-
-> Feel free to open an ![Issues](https://github.com/ZagonAb/Anbernic-Theme/issues) to report errors.
 
 ![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/4228a0abacf9432cb65a704afd8fda66e225d07a/.meta/screenshots/screen0.png)
 
