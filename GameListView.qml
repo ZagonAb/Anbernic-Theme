@@ -21,6 +21,13 @@ ListView {
     property int currentMediaType: 0
     property var availableMedia: []
 
+    property bool alphaScrollEnabled: proxyModel.count > 100
+    property bool alphaScrollActive: false
+    property string alphaScrollLetter: "A"
+    property int alphaScrollDirection: 1
+    property bool upHeld: false
+    property bool downHeld: false
+
     signal updateImageSource(string source)
     signal updateMediaType(int mediaType)
     signal updateAvailableMedia(var media)
@@ -87,7 +94,96 @@ ListView {
     highlightFollowsCurrentItem: true
     highlightMoveDuration: 0
 
+    Timer {
+        id: holdTimer
+        interval: 1200
+        repeat: false
+        onTriggered: {
+            if (!gameListView.alphaScrollEnabled) return
+            if (gameListView.upHeld || gameListView.downHeld) {
+                gameListView.alphaScrollActive = true
+                var g = proxyModel.get(gameListView.currentIndex)
+                if (g && g.title.length > 0) {
+                    var ch = g.title[0].toUpperCase()
+                    gameListView.alphaScrollLetter = (ch >= "A" && ch <= "Z") ? ch : "A"
+                } else {
+                    gameListView.alphaScrollLetter = "A"
+                }
+                alphaStepTimer.start()
+            }
+        }
+    }
+
+    Timer {
+        id: alphaStepTimer
+        interval: 400
+        repeat: true
+        onTriggered: {
+            if (!gameListView.alphaScrollActive) { stop(); return }
+            if (!gameListView.upHeld && !gameListView.downHeld) {
+                gameListView.deactivateAlphaScroll()
+                stop()
+                return
+            }
+            gameListView.advanceLetter()
+            gameListView.jumpToLetter(gameListView.alphaScrollLetter)
+        }
+    }
+
+    Timer {
+        id: alphaReleaseTimer
+        interval: 500
+        repeat: false
+        onTriggered: {
+            if (gameListView.alphaScrollActive) {
+                gameListView.deactivateAlphaScroll()
+            }
+        }
+    }
+
+    function advanceLetter() {
+        var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#"
+        var idx = letters.indexOf(alphaScrollLetter)
+        if (idx === -1) idx = 0
+        idx = (idx + alphaScrollDirection + letters.length) % letters.length
+        alphaScrollLetter = letters[idx]
+    }
+
+    function jumpToLetter(letter) {
+        for (var i = 0; i < proxyModel.count; i++) {
+            var g = proxyModel.get(i)
+            if (!g) continue
+            var ch = g.title[0].toUpperCase()
+            if (letter === "#") {
+                if (ch < "A" || ch > "Z") { currentIndex = i; positionViewAtIndex(i, ListView.Center); return }
+            } else {
+                if (ch === letter) { currentIndex = i; positionViewAtIndex(i, ListView.Center); return }
+            }
+        }
+    }
+
+    function deactivateAlphaScroll() {
+        alphaScrollActive = false
+        upHeld = false
+        downHeld = false
+        holdTimer.stop()
+        alphaStepTimer.stop()
+        alphaReleaseTimer.stop()
+    }
+
     Keys.onUpPressed: {
+        if (alphaScrollActive) {
+            alphaScrollDirection = -1
+            alphaReleaseTimer.restart()
+            event.accepted = true
+            return
+        }
+        downHeld = false
+        upHeld = true
+        alphaScrollDirection = -1
+        if (alphaScrollEnabled && !holdTimer.running) holdTimer.restart()
+        alphaReleaseTimer.restart()
+
         naviSound.play();
         if (currentIndex <= 0) {
             positionViewAtIndex(count - 1, ListView.Contain);
@@ -98,6 +194,18 @@ ListView {
     }
 
     Keys.onDownPressed: {
+        if (alphaScrollActive) {
+            alphaScrollDirection = 1
+            alphaReleaseTimer.restart()
+            event.accepted = true
+            return
+        }
+        upHeld = false
+        downHeld = true
+        alphaScrollDirection = 1
+        if (alphaScrollEnabled && !holdTimer.running) holdTimer.restart()
+        alphaReleaseTimer.restart()
+
         naviSound.play();
         if (currentIndex >= count - 1) {
             positionViewAtIndex(0, ListView.Contain);
@@ -178,6 +286,23 @@ ListView {
         }
     }
 
+    Keys.onReleased: function(event) {
+        if (event.isAutoRepeat) return
+        var wasUp = (event.key === Qt.Key_Up)
+        var wasDown = (event.key === Qt.Key_Down)
+
+        if (wasUp || wasDown) {
+            if (alphaScrollActive) {
+                deactivateAlphaScroll()
+            } else {
+                upHeld = false
+                downHeld = false
+                holdTimer.stop()
+                alphaReleaseTimer.stop()
+            }
+        }
+    }
+
     function getFirstAvailableMedia() {
         for (let i = 0; i < availableMedia.length; i++) {
             const item = availableMedia[i];
@@ -215,10 +340,10 @@ ListView {
                     if (src && src.toString() !== "") {
                         allItems.push({
                             source: src.toString(),
-                                      type:   type,
-                                      label:  label + (list.length > 1 ? " " + (i + 1) : ""),
-                                      isVideo: isVid,
-                                      orderPriority: priority
+                            type: type,
+                            label: label + (list.length > 1 ? " " + (i + 1) : ""),
+                            isVideo: isVid,
+                            orderPriority: priority
                         });
                     }
                 }
@@ -232,16 +357,16 @@ ListView {
             if (src && src.toString() !== "") {
                 allItems.push({
                     source: src.toString(),
-                              type:   type,
-                              label:  label,
-                              isVideo: isVid,
-                              orderPriority: priority
+                    type: type,
+                    label: label,
+                    isVideo: isVid,
+                    orderPriority: priority
                 });
             }
         }
 
-        if (!tryAddList("screenshotList", "screenshot",  "Screenshot",  1, false))
-            tryAdd("screenshot",  "screenshot",  "Screenshot",  1, false);
+        if (!tryAddList("screenshotList", "screenshot", "Screenshot", 1, false))
+            tryAdd("screenshot", "screenshot", "Screenshot", 1, false);
 
         if (!tryAddList("titlescreenList", "titlescreen", "Title Screen", 2, false))
             tryAdd("titlescreen", "titlescreen", "Title Screen", 2, false);
@@ -291,61 +416,60 @@ ListView {
         if (gameImage && gameImage.videoLoader && gameImage.videoLoader.item &&
             gameImage.videoLoader.item.mediaPlayer) {
             gameImage.videoLoader.item.mediaPlayer.stop();
-            }
+        }
 
-            if (proxyModel.count === 0) {
-                currentGameImageSource = "assets/gamepad/default.png";
-                game = null;
-                availableMedia = [];
-                if (gameImage && gameImage.videoLoader) gameImage.videoLoader.active = false;
-                if (gameImage && gameImage.infoLoader)  gameImage.infoLoader.active  = false;
-            } else {
-                game = proxyModel.get(currentIndex);
-                availableMedia = getAvailableMedia();
+        if (proxyModel.count === 0) {
+            currentGameImageSource = "assets/gamepad/default.png";
+            game = null;
+            availableMedia = [];
+            if (gameImage && gameImage.videoLoader) gameImage.videoLoader.active = false;
+            if (gameImage && gameImage.infoLoader) gameImage.infoLoader.active = false;
+        } else {
+            game = proxyModel.get(currentIndex);
+            availableMedia = getAvailableMedia();
 
-                if (availableMedia.length === 0 ||
-                    (availableMedia.length === 1 && availableMedia[0].type === "info")) {
-                    currentGameImageSource = "";
+            if (availableMedia.length === 0 ||
+                (availableMedia.length === 1 && availableMedia[0].type === "info")) {
+                currentGameImageSource = "";
                 currentMediaType = availableMedia.length > 0 ? 0 : 0;
                 updateImageSource(currentGameImageSource);
                 updateMediaType(currentMediaType);
                 updateAvailableMedia(availableMedia);
                 return;
-                    }
-
-                    if (currentMediaType >= availableMedia.length) {
-                        currentMediaType = 0;
-                    }
-
-                    var item = availableMedia[currentMediaType];
-
-                    if (item.type === "info") {
-                        currentGameImageSource = "";
-                    } else if (item.source !== "") {
-                        currentGameImageSource = item.source;
-                    } else {
-
-                        var found = false;
-                        for (var i = 0; i < availableMedia.length; i++) {
-                            var fb = availableMedia[i];
-                            if (fb.type !== "info" && fb.source !== "") {
-                                currentGameImageSource = fb.source;
-                                currentMediaType = i;
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            var infoIdx = availableMedia.length - 1;
-                            currentGameImageSource = "";
-                            currentMediaType = infoIdx;
-                        }
-                    }
             }
 
-            updateImageSource(currentGameImageSource);
-            updateMediaType(currentMediaType);
-            updateAvailableMedia(availableMedia);
+            if (currentMediaType >= availableMedia.length) {
+                currentMediaType = 0;
+            }
+
+            var item = availableMedia[currentMediaType];
+
+            if (item.type === "info") {
+                currentGameImageSource = "";
+            } else if (item.source !== "") {
+                currentGameImageSource = item.source;
+            } else {
+                var found = false;
+                for (var i = 0; i < availableMedia.length; i++) {
+                    var fb = availableMedia[i];
+                    if (fb.type !== "info" && fb.source !== "") {
+                        currentGameImageSource = fb.source;
+                        currentMediaType = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    var infoIdx = availableMedia.length - 1;
+                    currentGameImageSource = "";
+                    currentMediaType = infoIdx;
+                }
+            }
+        }
+
+        updateImageSource(currentGameImageSource);
+        updateMediaType(currentMediaType);
+        updateAvailableMedia(availableMedia);
     }
 
     function handleGameLaunch() {

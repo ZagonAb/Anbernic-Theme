@@ -15,7 +15,7 @@ FocusScope {
     property bool collectionsFocused: true
     property bool gamesVisible: false
     property bool gamesFocused: false
-    property var game : null
+    property var game: null
     property int filterState: 0
     property alias consoleYears: consoleYearsObj.data
     property alias consoleColors: consoleColorsObj.data
@@ -127,7 +127,6 @@ FocusScope {
             hours = hours % 12;
             hours = hours ? hours : 12;
             let minutesStr = minutes < 10 ? "0" + minutes : minutes;
-
             return hours + ":" + minutesStr + " " + ampm;
         }
         text: formatTime()
@@ -191,9 +190,18 @@ FocusScope {
     }
 
     Item {
+        id: gamesPanel
         width: parent.width
         height: parent.height
         visible: gamesVisible
+
+        layer.enabled: gameListView.alphaScrollActive
+        layer.effect: FastBlur {
+            radius: gameListView.alphaScrollActive ? 48 : 0
+            Behavior on radius {
+                NumberAnimation { duration: 220; easing.type: Easing.InOutQuad }
+            }
+        }
 
         Item {
             id: animatableItem
@@ -660,21 +668,52 @@ FocusScope {
         }
     }
 
+    Item {
+        id: alphaOverlay
+        anchors.centerIn: parent
+        width: letterBg.width
+        height: letterBg.height
+        z: 9999
+        visible: gamesVisible && gameListView.alphaScrollEnabled
+        opacity: gameListView.alphaScrollActive ? 1 : 0
+        Behavior on opacity {
+            NumberAnimation { duration: 180; easing.type: Easing.InOutQuad }
+        }
+
+        Rectangle {
+            id: letterBg
+            width: root.width * 0.22
+            height: root.height * 0.32
+            radius: root.width * 0.025
+            color: "#CC000000"
+        }
+
+        Rectangle {
+            anchors.fill: letterBg
+            radius: letterBg.radius
+            color: "transparent"
+            border.color: getColorForSystem(currentShortName)
+            border.width: root.width * 0.004
+            opacity: 0.85
+        }
+
+        Text {
+            anchors.centerIn: parent
+            text: gameListView.alphaScrollLetter
+            color: "white"
+            font.pixelSize: root.width * 0.14
+            font.bold: true
+            style: Text.Outline
+            styleColor: "#80000000"
+        }
+    }
+
     Keys.onPressed: {
         if (event.isAutoRepeat) {
             return;
         }
 
-        /*if (api.keys.isPageUp(event)) {
-            event.accepted = true;
-            musicPlayer.nextTrack();
-        }
-        else if (api.keys.isPageDown(event)) {
-            event.accepted = true;
-            musicPlayer.previousTrack();
-        }*/
-
-        else if (gamesVisible && gameImage.visible) {
+        if (gamesVisible && gameImage.visible) {
             if (api.keys.isNextPage(event)) {
                 event.accepted = true;
                 var newVolume = Math.min(1.0, gameImage.savedVolume + 0.05);
