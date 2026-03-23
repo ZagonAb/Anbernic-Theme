@@ -127,7 +127,7 @@ PathView {
                 text: modelData.shortName.toUpperCase() || ""
                 color: "white"
                 font.bold: true
-                font.pixelSize: delegateItem.width * 0.12
+                font.pixelSize: delegateItem.width * 0.10
             }
 
             Text {
