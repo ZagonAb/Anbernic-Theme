@@ -483,6 +483,8 @@ ListView {
                     if (g.title === filteredGame.title) { originalGameIndex = i; break; }
                 }
                 if (originalGameIndex !== -1) {
+                    api.memory.set('lastCollectionIndex', systemView.currentIndex);
+                    api.memory.set('lastGameTitle', filteredGame.title);
                     currentCollection.games.get(originalGameIndex).launch();
                 }
             }

@@ -17,6 +17,7 @@ FocusScope {
     property bool gamesFocused: false
     property var game: null
     property int filterState: 0
+    property bool restoringState: false
     property alias consoleYears: consoleYearsObj.data
     property alias consoleColors: consoleColorsObj.data
 
@@ -802,9 +803,61 @@ FocusScope {
             if (systemView.currentIndex >= 0) {
                 const selectedCollection = api.collections.get(systemView.currentIndex);
                 proxyModel.sourceModel = selectedCollection.games;
-                gameListView.currentIndex = 0;
-                gameListView.updateGameImage();
+                if (!root.restoringState) {
+                    gameListView.currentIndex = 0;
+                    gameListView.updateGameImage();
+                }
             }
         }
+    }
+
+    Timer {
+        id: restoreTimer
+        interval: 150
+        repeat: false
+        onTriggered: {
+            const savedCollectionIndex = api.memory.get('lastCollectionIndex');
+            const savedGameTitle       = api.memory.get('lastGameTitle');
+
+            if (savedCollectionIndex === undefined || savedGameTitle === undefined) return;
+
+            api.memory.unset('lastCollectionIndex');
+            api.memory.unset('lastGameTitle');
+
+            const collIdx = parseInt(savedCollectionIndex);
+
+            if (collIdx < 0 || collIdx >= api.collections.count) return;
+
+            root.restoringState = true;
+
+            systemView.currentIndex = collIdx;
+
+            Qt.callLater(function() {
+                let targetIdx = 0;
+                for (let i = 0; i < proxyModel.count; i++) {
+                    const g = proxyModel.get(i);
+                    if (g && g.title === savedGameTitle) {
+                        targetIdx = i;
+                        break;
+                    }
+                }
+
+                gameListView.currentIndex = targetIdx;
+                gameListView.positionViewAtIndex(targetIdx, ListView.Center);
+                gameListView.updateGameImage();
+
+                collectionsVisible = false;
+                collectionsFocused = false;
+                gamesVisible = true;
+                gamesFocused = true;
+                gameListView.forceActiveFocus();
+
+                root.restoringState = false;
+            });
+        }
+    }
+
+    Component.onCompleted: {
+        restoreTimer.start();
     }
 }
