@@ -1,3 +1,11 @@
+// BigScreenFE Theme
+// Copyright (C) 2026 Gonzalo
+//
+// Licensed under Creative Commons
+// Attribution-NonCommercial-ShareAlike 4.0 International.
+//
+// https://creativecommons.org/licenses/by-nc-sa/4.0/
+
 import QtQuick 2.15
 
 QtObject {
@@ -102,6 +110,8 @@ QtObject {
         "virtualboy": "#1b0607",
         "supergrafx": "#6a3921",
         "ports": "#ac3903",
+        "model2": "#003366"
+        "model3": "#003366"
         "vectrex": "#151414",
         "commodoreplus4": "#150d08",
         "naomi": "#701d0b",
