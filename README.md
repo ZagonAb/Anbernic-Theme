@@ -6,11 +6,10 @@
 > 📢 No more updates.
 
 
-![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/4228a0abacf9432cb65a704afd8fda66e225d07a/.meta/screenshots/screen0.png)
+![screen](https://github.com/ZagonAb/Anbernic-Theme/blob/c5a4360ae8769f8f09b3fa907ee8cd7fc1499af6/.meta/screenshots/screen0.png)
 
-![screen1](https://github.com/ZagonAb/Anbernic-Theme/blob/4228a0abacf9432cb65a704afd8fda66e225d07a/.meta/screenshots/screen1.png)
-
-![screen2](https://github.com/ZagonAb/Anbernic-Theme/blob/4228a0abacf9432cb65a704afd8fda66e225d07a/.meta/screenshots/screen2.png)
+![screen1](https://github.com/ZagonAb/Anbernic-Theme/blob/c5a4360ae8769f8f09b3fa907ee8cd7fc1499af6/.meta/screenshots/screen1.png)
+----
 
 # Short name icons
 - The PathView [images](https://github.com/ZagonAb/Systems-Arts-consoles) have been recreated trying to maintain the greatest possible fidelity to the original style.
